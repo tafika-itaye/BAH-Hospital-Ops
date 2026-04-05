@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1">
+<title>BAH Operations Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+--navy:#0B2545;--blue:#13538A;--teal:#1B7A6E;--teal-lt:#23A08D;--gold:#C6922A;
+--white:#FAFBFC;--g50:#F4F5F7;--g100:#E8EAED;--g200:#D0D4DB;--g300:#B0B7C3;
+--g500:#6E7787;--g600:#5A6377;--g800:#2D3340;--red:#C0392B;--red-lt:#FDF0EF;
+--green:#27AE60;--green-lt:#EAFAF1;--orange:#E67E22;--orange-lt:#FEF5E7;
+--purple:#7B4B94;--sidebar-w:240px;--header-h:56px;
+--font:'DM Sans',system-ui,sans-serif;--font-d:'Playfair Display',Georgia,serif;
+--radius:8px;--shadow:0 2px 8px rgba(11,37,69,.08);--shadow-lg:0 8px 32px rgba(11,37,69,.12);
+--transition:.2s cubic-bezier(.4,0,.2,1);
+}
+html,body{height:100%;font-family:var(--font);color:var(--g800);background:var(--g50)}
+body{overflow:hidden}
+a{color:var(--teal);text-decoration:none}
+
+/* ===== SPLASH ===== */
+.splash{position:fixed;inset:0;z-index:9999;background:var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .5s,visibility .5s}
+.splash.hidden{opacity:0;visibility:hidden;pointer-events:none}
+.splash-icon{width:72px;height:72px;background:linear-gradient(135deg,var(--teal),var(--teal-lt));border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem;animation:sp 1.8s ease-in-out infinite}
+.splash-icon svg{width:38px;height:38px;fill:#fff}
+@keyframes sp{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+.splash h1{font-family:var(--font-d);font-size:1.4rem;color:#fff;margin-bottom:.3rem}
+.splash p{font-size:.8rem;color:var(--g300);margin-bottom:2rem}
+.splash-bar{width:100px;height:3px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden}
+.splash-bar div{height:100%;background:linear-gradient(90deg,var(--teal),var(--teal-lt));border-radius:3px;animation:sbar 2s ease forwards}
+@keyframes sbar{0%{width:0}40%{width:55%}80%{width:88%}100%{width:100%}}
+.splash-ft{position:absolute;bottom:1.5rem;font-size:.65rem;color:rgba(255,255,255,.2)}
+
+/* ===== LOGIN ===== */
+#loginPage{display:none;position:fixed;inset:0;z-index:100;background:var(--navy);overflow-y:auto;-webkit-overflow-scrolling:touch}
+#loginPage.visible{display:flex;align-items:flex-start;justify-content:center;padding:2rem 1rem 3rem}
+.login-bg{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at 20% 50%,rgba(27,122,110,.12) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(19,83,138,.15) 0%,transparent 50%)}
+.login-wrap{position:relative;z-index:1;width:100%;max-width:420px;animation:fadeUp .5s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.login-brand{text-align:center;margin-bottom:1.5rem}
+.login-brand .ico{width:56px;height:56px;background:linear-gradient(135deg,var(--teal),var(--teal-lt));border-radius:14px;display:inline-flex;align-items:center;justify-content:center;margin-bottom:.75rem;box-shadow:0 8px 20px rgba(27,122,110,.3)}
+.login-brand .ico svg{width:28px;height:28px;fill:#fff}
+.login-brand h1{font-family:var(--font-d);font-size:1.35rem;color:#fff}
+.login-brand p{font-size:.8rem;color:var(--g300);margin-top:.2rem}
+.login-card{background:var(--white);border-radius:14px;padding:1.75rem 1.5rem 1.5rem;box-shadow:var(--shadow-lg)}
+.login-card h2{font-size:1rem;font-weight:600;margin-bottom:1rem}
+.field{margin-bottom:1rem}
+.field label{display:block;font-size:.75rem;font-weight:600;color:var(--g500);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.3rem}
+.field input{width:100%;padding:.6rem .75rem;font-family:var(--font);font-size:.875rem;border:1.5px solid var(--g100);border-radius:var(--radius);background:var(--g50);outline:none;transition:border var(--transition),box-shadow var(--transition);-webkit-appearance:none}
+.field input:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(27,122,110,.1);background:#fff}
+.field input::placeholder{color:var(--g300)}
+.login-error{display:none;background:var(--red-lt);border:1px solid #F5C6C2;border-radius:6px;padding:.5rem .7rem;margin-bottom:.75rem;font-size:.78rem;color:var(--red)}
+.login-error.visible{display:block}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;padding:.6rem 1.25rem;font-family:var(--font);font-size:.8125rem;font-weight:600;border:none;border-radius:var(--radius);cursor:pointer;transition:all var(--transition)}
+.btn-primary{background:linear-gradient(135deg,var(--teal),var(--blue));color:#fff;width:100%;padding:.7rem}
+.btn-primary:hover{box-shadow:0 4px 16px rgba(27,122,110,.3);transform:translateY(-1px)}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-secondary{background:var(--g50);color:var(--g800);border:1.5px solid var(--g100)}
+.btn-secondary:hover{border-color:var(--teal);color:var(--teal)}
+.btn-danger{background:var(--red);color:#fff}
+.btn-danger:hover{background:#A93226}
+.btn-sm{padding:.4rem .75rem;font-size:.75rem}
+.btn-ghost{background:transparent;color:var(--g500);border:1px solid var(--g200)}
+.btn-ghost:hover{color:var(--teal);border-color:var(--teal)}
+.ql{margin-top:1rem;border-top:1px solid var(--g100);padding-top:.75rem}
+.ql-label{font-size:.7rem;font-weight:600;color:var(--g300);text-transform:uppercase;letter-spacing:.06em;text-align:center;margin-bottom:.5rem}
+.ql-grid{display:grid;grid-template-columns:1fr 1fr;gap:.35rem}
+.ql-btn{display:flex;align-items:center;gap:.4rem;padding:.4rem .5rem;font-family:var(--font);font-size:.75rem;background:var(--g50);border:1.5px solid var(--g100);border-radius:6px;cursor:pointer;transition:all var(--transition);text-align:left}
+.ql-btn:hover{border-color:var(--teal);color:var(--teal)}
+.ql-btn .qi{width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ql-btn .qi svg{width:12px;height:12px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ql-btn strong{display:block;font-size:.75rem;color:var(--g800)}
+.ql-btn span{font-size:.65rem;color:var(--g300)}
+.ql-btn:hover strong{color:var(--teal)}
+.login-ft{text-align:center;margin-top:1.25rem;font-size:.7rem;color:rgba(255,255,255,.3);line-height:1.5}
+.login-ft a{color:rgba(255,255,255,.45)}
+
+/* ===== APP SHELL ===== */
+#app{display:none;height:100vh;overflow:hidden}
+#app.visible{display:flex}
+
+/* Sidebar */
+.sidebar{width:var(--sidebar-w);background:var(--navy);color:#fff;display:flex;flex-direction:column;height:100vh;flex-shrink:0;transition:transform .3s ease;z-index:50}
+.sb-brand{padding:1rem;display:flex;align-items:center;gap:.6rem;border-bottom:1px solid rgba(255,255,255,.08)}
+.sb-brand .ico{width:32px;height:32px;background:linear-gradient(135deg,var(--teal),var(--teal-lt));border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-brand .ico svg{width:16px;height:16px;fill:#fff}
+.sb-brand span{font-size:.8rem;font-weight:600;line-height:1.2}
+.sb-nav{flex:1;padding:.5rem 0;overflow-y:auto}
+.sb-section{padding:.25rem .75rem;font-size:.6rem;font-weight:600;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.08em;margin-top:.5rem}
+.sb-link{display:flex;align-items:center;gap:.6rem;padding:.55rem 1rem;font-size:.8rem;color:rgba(255,255,255,.55);cursor:pointer;transition:all var(--transition);border-left:3px solid transparent;margin:1px 0}
+.sb-link:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.85)}
+.sb-link.active{background:rgba(27,122,110,.15);color:var(--teal-lt);border-left-color:var(--teal-lt)}
+.sb-link svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.sb-link .badge{margin-left:auto;background:var(--red);color:#fff;font-size:.6rem;font-weight:700;padding:.1rem .4rem;border-radius:10px;min-width:18px;text-align:center}
+.sb-user{padding:.75rem 1rem;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:.6rem}
+.sb-avatar{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:#fff;flex-shrink:0}
+.sb-uinfo{flex:1;min-width:0}
+.sb-uinfo strong{display:block;font-size:.75rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-uinfo span{font-size:.65rem;color:rgba(255,255,255,.4)}
+.sb-logout{background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;padding:4px}
+.sb-logout:hover{color:var(--red)}
+.sb-logout svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* Main */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.topbar{height:var(--header-h);background:#fff;border-bottom:1px solid var(--g100);display:flex;align-items:center;padding:0 1.25rem;gap:.75rem;flex-shrink:0}
+.menu-toggle{display:none;background:none;border:none;cursor:pointer;padding:4px}
+.menu-toggle svg{width:22px;height:22px;stroke:var(--g600);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.topbar h2{font-size:1rem;font-weight:600;flex:1}
+.topbar-actions{display:flex;align-items:center;gap:.5rem}
+.content{flex:1;overflow-y:auto;padding:1.25rem;-webkit-overflow-scrolling:touch}
+
+/* ===== COMPONENTS ===== */
+/* Cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.75rem;margin-bottom:1.25rem}
+.card{background:#fff;border-radius:var(--radius);padding:1rem;box-shadow:var(--shadow);border-left:3px solid var(--g200)}
+.card-teal{border-left-color:var(--teal)}
+.card-blue{border-left-color:var(--blue)}
+.card-gold{border-left-color:var(--gold)}
+.card-red{border-left-color:var(--red)}
+.card-green{border-left-color:var(--green)}
+.card-purple{border-left-color:var(--purple)}
+.card .label{font-size:.7rem;font-weight:600;color:var(--g500);text-transform:uppercase;letter-spacing:.04em}
+.card .value{font-size:1.5rem;font-weight:700;color:var(--g800);margin:.25rem 0}
+.card .sub{font-size:.7rem;color:var(--g300)}
+
+/* Tables */
+.tbl-wrap{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:1rem}
+.tbl-head{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1rem;border-bottom:1px solid var(--g100);flex-wrap:wrap;gap:.5rem}
+.tbl-head h3{font-size:.875rem;font-weight:600}
+.tbl-filters{display:flex;gap:.4rem;flex-wrap:wrap}
+.tbl-filters select,.tbl-filters input{font-family:var(--font);font-size:.75rem;padding:.35rem .5rem;border:1.5px solid var(--g100);border-radius:6px;background:#fff;outline:none}
+.tbl-filters select:focus,.tbl-filters input:focus{border-color:var(--teal)}
+table{width:100%;border-collapse:collapse;font-size:.8rem}
+thead{background:var(--g50)}
+th{text-align:left;padding:.6rem .75rem;font-size:.7rem;font-weight:600;color:var(--g500);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+td{padding:.6rem .75rem;border-top:1px solid var(--g100);vertical-align:middle}
+tr:hover{background:rgba(27,122,110,.02)}
+.tbl-empty{text-align:center;padding:2rem;color:var(--g300);font-size:.8rem}
+
+/* Badges */
+.badge{display:inline-block;padding:.15rem .5rem;border-radius:4px;font-size:.7rem;font-weight:600}
+.badge-open{background:#E8F4FD;color:var(--blue)}
+.badge-progress{background:var(--orange-lt);color:var(--orange)}
+.badge-resolved{background:var(--green-lt);color:var(--green)}
+.badge-closed{background:var(--g50);color:var(--g500)}
+.badge-critical{background:var(--red-lt);color:var(--red)}
+.badge-high{background:#FDEDEC;color:#C0392B}
+.badge-medium{background:var(--orange-lt);color:var(--orange)}
+.badge-low{background:var(--green-lt);color:var(--green)}
+.badge-active{background:var(--green-lt);color:var(--green)}
+.badge-draft{background:var(--orange-lt);color:var(--orange)}
+.badge-review{background:#EDE7F6;color:var(--purple)}
+.badge-near-miss{background:var(--orange-lt);color:var(--orange)}
+.badge-incident{background:var(--red-lt);color:var(--red)}
+.badge-no-harm{background:var(--green-lt);color:var(--green)}
+.badge-sentinel{background:var(--red-lt);color:var(--red)}
+
+/* Clickable rows */
+.clickable{cursor:pointer}
+
+/* Modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(11,37,69,.4);z-index:200;align-items:flex-start;justify-content:center;padding:2rem 1rem;overflow-y:auto}
+.modal-overlay.visible{display:flex}
+.modal{background:#fff;border-radius:12px;width:100%;max-width:560px;box-shadow:var(--shadow-lg);animation:fadeUp .3s ease}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;border-bottom:1px solid var(--g100)}
+.modal-header h3{font-size:.95rem;font-weight:600}
+.modal-close{background:none;border:none;cursor:pointer;padding:4px;color:var(--g300)}
+.modal-close:hover{color:var(--g800)}
+.modal-close svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.modal-body{padding:1.25rem}
+.modal-footer{padding:.75rem 1.25rem;border-top:1px solid var(--g100);display:flex;justify-content:flex-end;gap:.5rem}
+
+/* Form inside modal */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.75rem}
+.form-row.full{grid-template-columns:1fr}
+.form-group{margin-bottom:.75rem}
+.form-group label{display:block;font-size:.75rem;font-weight:600;color:var(--g500);margin-bottom:.25rem}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:.5rem .65rem;font-family:var(--font);font-size:.8rem;border:1.5px solid var(--g100);border-radius:6px;background:#fff;outline:none;transition:border var(--transition)}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--teal)}
+.form-group textarea{resize:vertical;min-height:80px}
+
+/* Detail view */
+.detail-card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:1rem}
+.detail-header{padding:1rem 1.25rem;border-bottom:1px solid var(--g100);display:flex;align-items:flex-start;justify-content:space-between;gap:.75rem;flex-wrap:wrap}
+.detail-header h3{font-size:1rem;font-weight:600}
+.detail-body{padding:1.25rem}
+.detail-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1rem;margin-bottom:1rem}
+.detail-field .df-label{font-size:.7rem;font-weight:600;color:var(--g500);text-transform:uppercase;margin-bottom:.2rem}
+.detail-field .df-value{font-size:.85rem;color:var(--g800)}
+
+/* Timeline */
+.timeline{border-left:2px solid var(--g100);padding-left:1.25rem;margin-top:1rem}
+.tl-item{position:relative;padding-bottom:1rem}
+.tl-item::before{content:'';position:absolute;left:-1.35rem;top:.25rem;width:8px;height:8px;border-radius:50%;background:var(--teal);border:2px solid #fff}
+.tl-item .tl-time{font-size:.65rem;color:var(--g300)}
+.tl-item .tl-text{font-size:.8rem;color:var(--g800);margin-top:.15rem}
+.tl-item .tl-user{font-size:.7rem;color:var(--g500)}
+
+/* KPI bars */
+.kpi-card{background:#fff;border-radius:var(--radius);padding:1rem;box-shadow:var(--shadow);margin-bottom:.75rem}
+.kpi-card h4{font-size:.8rem;font-weight:600;margin-bottom:.75rem}
+.kpi-row{display:flex;align-items:center;gap:.75rem;margin-bottom:.6rem}
+.kpi-label{font-size:.75rem;color:var(--g600);width:140px;flex-shrink:0}
+.kpi-bar{flex:1;height:8px;background:var(--g100);border-radius:4px;overflow:hidden}
+.kpi-fill{height:100%;border-radius:4px;transition:width .6s ease}
+.kpi-val{font-size:.75rem;font-weight:600;width:40px;text-align:right}
+
+/* Toast */
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--g800);color:#fff;padding:.65rem 1rem;border-radius:var(--radius);font-size:.8rem;z-index:999;animation:toastIn .3s ease;box-shadow:var(--shadow-lg)}
+.toast.success{background:var(--green)}
+.toast.error{background:var(--red)}
+@keyframes toastIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* KB article */
+.kb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:.75rem}
+.kb-card{background:#fff;border-radius:var(--radius);padding:1rem;box-shadow:var(--shadow);cursor:pointer;transition:all var(--transition);border-left:3px solid var(--teal)}
+.kb-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px)}
+.kb-card h4{font-size:.85rem;font-weight:600;margin-bottom:.3rem}
+.kb-card p{font-size:.75rem;color:var(--g500);line-height:1.4}
+.kb-card .kb-meta{margin-top:.5rem;font-size:.65rem;color:var(--g300)}
+.kb-article{background:#fff;border-radius:var(--radius);padding:1.5rem;box-shadow:var(--shadow)}
+.kb-article h3{font-size:1.1rem;font-weight:600;margin-bottom:.75rem}
+.kb-article p,.kb-article li{font-size:.85rem;line-height:1.6;color:var(--g600);margin-bottom:.5rem}
+.kb-article ol,.kb-article ul{padding-left:1.25rem}
+.kb-article h4{font-size:.9rem;font-weight:600;margin:1rem 0 .5rem;color:var(--g800)}
+
+/* Policy detail */
+.attest-list{margin-top:1rem}
+.attest-row{display:flex;align-items:center;gap:.5rem;padding:.4rem 0;border-bottom:1px solid var(--g100);font-size:.8rem}
+.attest-check{color:var(--green);font-weight:700}
+.attest-pending{color:var(--g300)}
+
+/* Responsive */
+@media(max-width:768px){
+ .sidebar{position:fixed;left:0;top:0;transform:translateX(-100%);z-index:100}
+ .sidebar.open{transform:translateX(0)}
+ .sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:99}
+ .sb-overlay.visible{display:block}
+ .menu-toggle{display:block}
+ .cards{grid-template-columns:1fr 1fr}
+ .form-row{grid-template-columns:1fr}
+ .detail-grid{grid-template-columns:1fr 1fr}
+ .kb-grid{grid-template-columns:1fr}
+ .tbl-head{flex-direction:column;align-items:flex-start}
+ .ql-grid{grid-template-columns:1fr}
+}
+@media(max-width:480px){
+ .cards{grid-template-columns:1fr}
+ .detail-grid{grid-template-columns:1fr}
+ #loginPage.visible{padding:1rem .75rem 2rem}
+}
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div class="splash" id="splash">
+ <div class="splash-icon"><svg viewBox="0 0 24 24"><path d="M9 2h6v6h6v6h-6v6H9v-6H3V8h6z"/></svg></div>
+ <h1>Blantyre Adventist Hospital</h1>
+ <p>Operations Platform</p>
+ <div class="splash-bar"><div></div></div>
+ <div class="splash-ft">Powered by TechNexus MW</div>
+</div>
+
+<!-- LOGIN -->
+<div id="loginPage">
+ <div class="login-bg"></div>
+ <div class="login-wrap">
+  <div class="login-brand">
+   <div class="ico"><svg viewBox="0 0 24 24"><path d="M9 2h6v6h6v6h-6v6H9v-6H3V8h6z"/></svg></div>
+   <h1>Blantyre Adventist Hospital</h1>
+   <p>Operations Platform</p>
+  </div>
+  <div class="login-card">
+   <h2>Staff Login</h2>
+   <div class="login-error" id="loginError"></div>
+   <div class="field"><label>Username</label><input type="text" id="loginUser" placeholder="Enter your staff ID"></div>
+   <div class="field"><label>Password</label><input type="password" id="loginPass" placeholder="Enter your password"></div>
+   <button class="btn btn-primary" id="loginBtn">Sign In</button>
+   <div class="ql">
+    <div class="ql-label">Quick Access - Demo Accounts</div>
+    <div class="ql-grid" id="qlGrid"></div>
+   </div>
+  </div>
+  <div class="login-ft">&copy; 2026 Blantyre Adventist Hospital. All rights reserved.<br>Powered by <a href="https://technexusmw.com" target="_blank" rel="noopener">TechNexus MW</a></div>
+ </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+ <div class="sb-overlay" id="sbOverlay"></div>
+ <nav class="sidebar" id="sidebar">
+  <div class="sb-brand">
+   <div class="ico"><svg viewBox="0 0 24 24"><path d="M9 2h6v6h6v6h-6v6H9v-6H3V8h6z"/></svg></div>
+   <span>BAH Operations</span>
+  </div>
+  <div class="sb-nav" id="sbNav"></div>
+  <div class="sb-user" id="sbUser"></div>
+ </nav>
+ <div class="main">
+  <header class="topbar">
+   <button class="menu-toggle" id="menuToggle"><svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+   <h2 id="pageTitle">Dashboard</h2>
+   <div class="topbar-actions" id="topActions"></div>
+  </header>
+  <div class="content" id="content"></div>
+ </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+ <div class="modal" id="modal">
+  <div class="modal-header"><h3 id="modalTitle">Title</h3><button class="modal-close" id="modalClose"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+  <div class="modal-body" id="modalBody"></div>
+  <div class="modal-footer" id="modalFooter"></div>
+ </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ========== ICONS (SVG strings) ========== */
+var I = {
+ dash:'<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>',
+ ticket:'<svg viewBox="0 0 24 24"><path d="M14.5 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V7.5L14.5 2z"/><polyline points="14,2 14,8 20,8"/></svg>',
+ plus:'<svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
+ policy:'<svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+ incident:'<svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+ kpi:'<svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
+ kb:'<svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>',
+ logout:'<svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>',
+ bolt:'<svg viewBox="0 0 24 24"><path d="M12 15l-2 5 9-11h-5l2-5L7 15z"/></svg>',
+ monitor:'<svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',
+ heart:'<svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>',
+ steth:'<svg viewBox="0 0 24 24"><path d="M12 10v4m-2-2h4"/><circle cx="12" cy="12" r="10"/></svg>',
+ shield:'<svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+ users:'<svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>',
+ back:'<svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12,19 5,12 12,5"/></svg>',
+ search:'<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>'
+};
+
+/* ========== DATA STORE ========== */
+var USERS = {
+ 'admin':      {name:'Admin User',    role:'Administrator',     color:'#0B2545',init:'A'},
+ 'it.support': {name:'James Chirwa',  role:'IT Support',        color:'#13538A',init:'JC'},
+ 'nurse':      {name:'Grace Banda',   role:'Nurse',             color:'#2E86AB',init:'GB'},
+ 'doctor':     {name:'Dr. Phiri',     role:'Doctor',            color:'#1B7A6E',init:'DP'},
+ 'compliance': {name:'Mary Gondwe',   role:'Compliance Officer',color:'#C6922A',init:'MG'},
+ 'dept.head':  {name:'Peter Mwale',   role:'Department Head',   color:'#7B4B94',init:'PM'}
+};
+
+var DEPTS = ['IT','Maintenance','Procurement'];
+var CATEGORIES = {
+ IT:['Hardware Repair','Software Issue','Network/Connectivity','System Access','Cybersecurity','Other IT'],
+ Maintenance:['HVAC','Plumbing','Electrical','Medical Equipment','Facility Repair','Other Maintenance'],
+ Procurement:['Supply Request','Vendor Issue','Purchase Order','Delivery Issue','Other Procurement']
+};
+var PRIORITIES = ['Low','Medium','High','Critical'];
+var STATUSES = ['Open','In Progress','Resolved','Closed'];
+
+var nextId = 100;
+function genId(){ return 'TKT-'+(nextId++); }
+var nextIncId = 50;
+function genIncId(){ return 'INC-'+(nextIncId++); }
+
+var NOW = new Date();
+function daysAgo(n){var d=new Date(NOW);d.setDate(d.getDate()-n);return d}
+function fmt(d){if(!d)return'-';var dt=new Date(d);return dt.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})}
+function fmtTime(d){if(!d)return'-';var dt=new Date(d);return dt.toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}
+
+// Seed tickets
+var tickets = [
+ {id:'TKT-001',title:'MRI Machine Error Code E45',dept:'Maintenance',category:'Medical Equipment',priority:'Critical',status:'Open',reporter:'nurse',assignee:'it.support',created:daysAgo(0),updated:daysAgo(0),description:'MRI machine in Radiology Wing B is showing error code E45 and has stopped functioning. Patients are being redirected to Wing A.',asset:'MRI Scanner - Siemens Magnetom',location:'Radiology Wing B',timeline:[{time:daysAgo(0),text:'Ticket created',user:'Grace Banda'}]},
+ {id:'TKT-002',title:'Staff portal login failure',dept:'IT',category:'Software Issue',priority:'High',status:'In Progress',reporter:'compliance',assignee:'it.support',created:daysAgo(1),updated:daysAgo(0),description:'Multiple staff members unable to log into the staff portal since this morning. Error 500 on authentication.',asset:'Staff Portal v2.1',location:'All Departments',timeline:[{time:daysAgo(1),text:'Ticket created',user:'Mary Gondwe'},{time:daysAgo(0),text:'Assigned to IT Support. Investigating authentication server.',user:'James Chirwa'}]},
+ {id:'TKT-003',title:'Ward 3 air conditioning not working',dept:'Maintenance',category:'HVAC',priority:'High',status:'In Progress',reporter:'nurse',assignee:'admin',created:daysAgo(2),updated:daysAgo(1),description:'Air conditioning unit in Ward 3 has stopped working. Temperature is rising and affecting patient comfort.',asset:'HVAC Unit - Ward 3',location:'Ward 3',timeline:[{time:daysAgo(2),text:'Ticket created',user:'Grace Banda'},{time:daysAgo(1),text:'Technician dispatched. Parts ordered.',user:'Admin User'}]},
+ {id:'TKT-004',title:'Surgical gloves restock urgent',dept:'Procurement',category:'Supply Request',priority:'Critical',status:'Open',reporter:'doctor',assignee:null,created:daysAgo(0),updated:daysAgo(0),description:'Surgical gloves (Size M and L) stock critically low in Operating Theatre. Need emergency restock within 24 hours.',asset:null,location:'Operating Theatre',timeline:[{time:daysAgo(0),text:'Ticket created - Urgent procurement request',user:'Dr. Phiri'}]},
+ {id:'TKT-005',title:'Replace broken infusion pump',dept:'Maintenance',category:'Medical Equipment',priority:'Medium',status:'Resolved',reporter:'nurse',assignee:'it.support',created:daysAgo(5),updated:daysAgo(1),description:'Infusion pump in ICU bed 4 is malfunctioning. Flow rate inconsistent.',asset:'Infusion Pump - Bed 4 ICU',location:'ICU',timeline:[{time:daysAgo(5),text:'Ticket created',user:'Grace Banda'},{time:daysAgo(3),text:'Technician inspected. Pump needs replacement.',user:'James Chirwa'},{time:daysAgo(1),text:'New pump installed and calibrated. Testing complete.',user:'James Chirwa'}]},
+ {id:'TKT-006',title:'Network printer offline - Admin Block',dept:'IT',category:'Hardware Repair',priority:'Low',status:'Closed',reporter:'compliance',assignee:'it.support',created:daysAgo(8),updated:daysAgo(5),description:'HP LaserJet in Admin Block 2nd floor not responding to print jobs.',asset:'HP LaserJet Pro M404 - Admin 2F',location:'Admin Block, 2nd Floor',timeline:[{time:daysAgo(8),text:'Ticket created',user:'Mary Gondwe'},{time:daysAgo(7),text:'Driver reinstalled and printer reconfigured.',user:'James Chirwa'},{time:daysAgo(5),text:'Confirmed working. Ticket closed.',user:'Mary Gondwe'}]},
+ {id:'TKT-007',title:'New laptop setup for Dr. Mtambo',dept:'IT',category:'System Access',priority:'Medium',status:'In Progress',reporter:'dept.head',assignee:'it.support',created:daysAgo(3),updated:daysAgo(2),description:'New consultant Dr. Mtambo starting Monday. Needs laptop, email account, and system access configured.',asset:'Dell Latitude 5540 (New)',location:'Consulting Room 7',timeline:[{time:daysAgo(3),text:'Ticket created',user:'Peter Mwale'},{time:daysAgo(2),text:'Laptop received from stores. OS installation in progress.',user:'James Chirwa'}]},
+ {id:'TKT-008',title:'Pharmacy refrigerator temperature alarm',dept:'Maintenance',category:'Medical Equipment',priority:'High',status:'Open',reporter:'nurse',assignee:null,created:daysAgo(0),updated:daysAgo(0),description:'Pharmacy cold storage unit triggering temperature alarm. Current reading 12C, should be 2-8C. Medications at risk.',asset:'Pharmacy Cold Storage Unit B',location:'Pharmacy',timeline:[{time:daysAgo(0),text:'Ticket created - URGENT: Medications at risk',user:'Grace Banda'}]}
+];
+
+// Seed policies
+var policies = [
+ {id:'POL-001',title:'Infection Prevention and Control Policy',dept:'Clinical',version:'3.2',status:'Active',author:'Dr. Phiri',created:daysAgo(90),reviewed:daysAgo(10),nextReview:daysAgo(-80),description:'Comprehensive policy covering hand hygiene protocols, PPE usage, isolation procedures, and outbreak management for all clinical staff.',attested:['nurse','doctor','compliance','dept.head'],pending:['it.support','admin']},
+ {id:'POL-002',title:'Patient Data Privacy and Confidentiality',dept:'Administration',version:'2.1',status:'Active',author:'Mary Gondwe',created:daysAgo(120),reviewed:daysAgo(30),nextReview:daysAgo(-60),description:'Covers handling of patient medical records, electronic data protection, consent requirements, and breach notification procedures.',attested:['admin','compliance','doctor'],pending:['nurse','it.support','dept.head']},
+ {id:'POL-003',title:'Medical Equipment Maintenance Schedule',dept:'Maintenance',version:'1.5',status:'Under Review',author:'Peter Mwale',created:daysAgo(200),reviewed:daysAgo(5),nextReview:daysAgo(-25),description:'Defines preventive maintenance schedules, calibration requirements, and documentation standards for all medical equipment.',attested:['compliance','dept.head'],pending:['admin','it.support','nurse','doctor']},
+ {id:'POL-004',title:'Medication Administration and Safety',dept:'Clinical',version:'4.0',status:'Active',author:'Dr. Phiri',created:daysAgo(60),reviewed:daysAgo(15),nextReview:daysAgo(-75),description:'Five Rights of medication administration, double-check procedures, high-alert medications list, and error reporting requirements.',attested:['nurse','doctor','compliance','dept.head','admin'],pending:['it.support']},
+ {id:'POL-005',title:'Fire Safety and Emergency Evacuation',dept:'Administration',version:'2.0',status:'Active',author:'Admin User',created:daysAgo(150),reviewed:daysAgo(45),nextReview:daysAgo(-45),description:'Evacuation routes, fire warden responsibilities, assembly points, fire extinguisher locations, and drill schedules.',attested:['admin','nurse','doctor','it.support'],pending:['compliance','dept.head']},
+ {id:'POL-006',title:'IT Acceptable Use Policy',dept:'IT',version:'1.3',status:'Draft',author:'James Chirwa',created:daysAgo(10),reviewed:null,nextReview:null,description:'Guidelines for use of hospital IT resources including internet, email, removable media, and personal devices on hospital networks.',attested:[],pending:['admin','it.support','nurse','doctor','compliance','dept.head']}
+];
+
+// SOPs
+var sops = [
+ {id:'SOP-001',title:'Hand Hygiene Procedure',dept:'Clinical',version:'2.1',description:'Step-by-step hand washing and sanitization protocol per WHO guidelines. Applies before and after every patient contact.'},
+ {id:'SOP-002',title:'Biomedical Equipment Failure Response',dept:'Maintenance',version:'1.3',description:'Procedure for responding to equipment failure: immediate patient safety assessment, tagging, reporting, and escalation chain.'},
+ {id:'SOP-003',title:'IT Incident Response Procedure',dept:'IT',version:'1.0',description:'Steps for identifying, containing, eradicating, and recovering from IT security incidents. Includes communication templates.'},
+ {id:'SOP-004',title:'Procurement Request Workflow',dept:'Procurement',version:'2.0',description:'From requisition submission through approval chain, vendor selection, purchase order, delivery verification, and payment processing.'},
+ {id:'SOP-005',title:'Patient Discharge Process',dept:'Clinical',version:'3.1',description:'Discharge planning checklist, medication reconciliation, follow-up scheduling, patient education, and documentation requirements.'}
+];
+
+// Incidents
+var incidents = [
+ {id:'INC-001',type:'Near Miss',severity:'Medium',title:'Wrong medication almost administered',dept:'Clinical',reporter:'nurse',created:daysAgo(2),description:'Nurse identified incorrect medication label during double-check before administering to patient in Ward 2. Correct medication was then given. No harm to patient.',status:'Under Investigation',anonymous:false,actions:'Pharmacy labeling process under review. Additional verification step being added.'},
+ {id:'INC-002',type:'Incident',severity:'Low',title:'Patient slip in corridor - no injury',dept:'Maintenance',reporter:'doctor',created:daysAgo(5),description:'Patient slipped on wet floor near Ward 1 entrance. Wet floor sign was not displayed. Patient was not injured but was shaken.',status:'Closed',anonymous:false,actions:'Maintenance team reminded of wet floor sign protocol. Additional signage ordered.'},
+ {id:'INC-003',type:'Near Miss',severity:'High',title:'Allergy alert not flagged in system',dept:'IT',reporter:'doctor',created:daysAgo(1),description:'Patient with documented penicillin allergy was not flagged in electronic prescribing system. Doctor caught it from paper records before prescribing.',status:'Open',anonymous:false,actions:'IT investigating system bug. Manual allergy verification added as interim measure.'},
+ {id:'INC-004',type:'Incident',severity:'Critical',title:'Power outage affected ICU monitors',dept:'Maintenance',reporter:'nurse',created:daysAgo(7),description:'Brief power outage (approximately 45 seconds) caused ICU monitoring equipment to reset. Generator switchover delayed. All patients were stable.',status:'Resolved',anonymous:false,actions:'Generator auto-transfer switch tested and recalibrated. UPS batteries in ICU replaced.'},
+ {id:'INC-005',type:'Near Miss',severity:'Low',title:'Unlocked medication cabinet found',dept:'Clinical',reporter:'compliance',created:daysAgo(3),description:'Controlled substances cabinet in Pharmacy was found unlocked during evening security rounds. No medications missing per inventory check.',status:'Closed',anonymous:true,actions:'Lock mechanism replaced. Staff reminded of locking protocol. Additional CCTV coverage added.'}
+];
+
+// Knowledge Base
+var kbArticles = [
+ {id:'KB-001',title:'How to Submit a Ticket',category:'Getting Started',content:'<h4>Submitting a New Ticket</h4><p>Navigate to <strong>Tickets</strong> in the sidebar and click the <strong>New Ticket</strong> button. Fill in the required fields:</p><ol><li><strong>Title</strong> - Brief description of the issue</li><li><strong>Department</strong> - Select IT, Maintenance, or Procurement</li><li><strong>Category</strong> - Choose the most relevant category</li><li><strong>Priority</strong> - Low, Medium, High, or Critical</li><li><strong>Description</strong> - Detailed explanation of the issue</li><li><strong>Location</strong> - Where the issue is occurring</li></ol><p>After submission, you will receive a ticket ID for tracking. The system will automatically route your ticket to the appropriate team.</p><h4>Priority Guidelines</h4><p><strong>Critical:</strong> Patient safety at risk, complete system failure<br><strong>High:</strong> Significant impact on operations, multiple users affected<br><strong>Medium:</strong> Single user or non-urgent equipment issue<br><strong>Low:</strong> Minor inconvenience, enhancement request</p>'},
+ {id:'KB-002',title:'Understanding SLA Response Times',category:'Ticketing',content:'<h4>Service Level Agreements</h4><p>Response and resolution times are defined by ticket priority:</p><ul><li><strong>Critical:</strong> Response within 15 minutes, resolution within 4 hours</li><li><strong>High:</strong> Response within 1 hour, resolution within 8 hours</li><li><strong>Medium:</strong> Response within 4 hours, resolution within 24 hours</li><li><strong>Low:</strong> Response within 8 hours, resolution within 72 hours</li></ul><p>Escalation occurs automatically if SLA deadlines are approaching. Department heads are notified when a ticket exceeds 75% of its SLA window.</p>'},
+ {id:'KB-003',title:'Reporting an Incident or Near Miss',category:'Compliance',content:'<h4>When to Report</h4><p>All staff are required to report any event that caused or could have caused harm to a patient, visitor, or staff member. This includes:</p><ul><li>Medication errors or near misses</li><li>Equipment failures during patient care</li><li>Falls or injuries on hospital premises</li><li>Security incidents</li><li>Data breaches or privacy violations</li></ul><h4>Anonymous Reporting</h4><p>You may choose to report anonymously. Anonymous reports are treated with the same priority and investigation rigor as identified reports. The goal is to build a culture of safety, not blame.</p><h4>Severity Classification</h4><p><strong>No Harm:</strong> Event occurred but no harm resulted<br><strong>Near Miss:</strong> Event was caught before reaching the patient<br><strong>Incident:</strong> Event reached the patient but caused minimal or no harm<br><strong>Sentinel Event:</strong> Serious event requiring immediate investigation</p>'},
+ {id:'KB-004',title:'Password Reset and Account Access',category:'IT Support',content:'<h4>Self-Service Password Reset</h4><p>If you have forgotten your password or your account is locked:</p><ol><li>Contact IT Support by submitting a ticket under IT &gt; System Access</li><li>Or call the IT Help Desk at extension 2200</li><li>Or email technexus_mw@proton.me</li></ol><h4>New Account Requests</h4><p>Department heads can request new accounts for incoming staff by submitting a ticket with the following information: full name, employee ID, department, required system access level, and start date.</p>'},
+ {id:'KB-005',title:'Medical Equipment Maintenance Requests',category:'Maintenance',content:'<h4>Preventive vs Corrective Maintenance</h4><p><strong>Preventive:</strong> Scheduled maintenance is handled automatically based on equipment maintenance calendars. You do not need to submit tickets for scheduled maintenance.</p><p><strong>Corrective:</strong> For equipment malfunctions or failures, submit a ticket under Maintenance with the following details:</p><ul><li>Equipment name and asset tag number</li><li>Location of the equipment</li><li>Description of the malfunction</li><li>Any error codes displayed</li><li>Whether patient care is affected (this determines priority)</li></ul><h4>Do Not Attempt Repairs</h4><p>Staff should never attempt to repair medical equipment themselves. Tag the equipment as "Out of Service" and submit a maintenance ticket immediately.</p>'},
+ {id:'KB-006',title:'Procurement Request Process',category:'Procurement',content:'<h4>How to Request Supplies or Equipment</h4><ol><li>Submit a ticket under Procurement &gt; Supply Request</li><li>Include: item description, quantity, preferred vendor (if known), budget code, and required delivery date</li><li>Department head approval is required for orders over MK 500,000</li><li>Finance approval is required for orders over MK 2,000,000</li></ol><h4>Emergency Procurement</h4><p>For urgent/emergency supplies (e.g., critical medication shortages), mark the ticket as Critical priority. Emergency procurement bypasses the standard approval chain but requires post-approval documentation within 48 hours.</p>'}
+];
+
+/* ========== STATE ========== */
+var currentUser = null;
+var currentView = 'dashboard';
+var currentDetail = null;
+
+/* ========== DOM ========== */
+var $ = function(id){ return document.getElementById(id); };
+
+/* ========== TOAST ========== */
+function toast(msg, type){
+ var t = document.createElement('div');
+ t.className = 'toast ' + (type||'');
+ t.textContent = msg;
+ document.body.appendChild(t);
+ setTimeout(function(){ t.remove(); }, 2500);
+}
+
+/* ========== MODAL ========== */
+function openModal(title, bodyHtml, footerHtml){
+ $('modalTitle').textContent = title;
+ $('modalBody').innerHTML = bodyHtml;
+ $('modalFooter').innerHTML = footerHtml || '';
+ $('modalOverlay').classList.add('visible');
+}
+function closeModal(){
+ $('modalOverlay').classList.remove('visible');
+}
+$('modalClose').onclick = closeModal;
+$('modalOverlay').addEventListener('click', function(e){
+ if(e.target === $('modalOverlay')) closeModal();
+});
+
+/* ========== LOGIN ========== */
+function buildLoginButtons(){
+ var grid = $('qlGrid');
+ var keys = Object.keys(USERS);
+ var icons = {admin:I.bolt,'it.support':I.monitor,nurse:I.heart,doctor:I.steth,compliance:I.shield,'dept.head':I.users};
+ grid.innerHTML = keys.map(function(k){
+  var u = USERS[k];
+  return '<button class="ql-btn" data-user="'+k+'"><span class="qi" style="background:'+u.color+'">'+icons[k]+'</span><span><strong>'+u.role+'</strong><span>'+k+'</span></span></button>';
+ }).join('');
+}
+
+function login(username){
+ var u = USERS[username];
+ if(!u){
+  $('loginError').textContent = 'Invalid username. Use a demo account.';
+  $('loginError').classList.add('visible');
+  return;
+ }
+ currentUser = {username:username, name:u.name, role:u.role, color:u.color, init:u.init};
+ sessionStorage.setItem('bah_session', JSON.stringify(currentUser));
+ $('loginPage').classList.remove('visible');
+ $('loginPage').style.display='none';
+ $('app').classList.add('visible');
+ buildApp();
+ navigate('dashboard');
+}
+
+$('loginBtn').addEventListener('click', function(){
+ login($('loginUser').value.trim().toLowerCase());
+});
+$('loginUser').addEventListener('keydown', function(e){ if(e.key==='Enter') login(this.value.trim().toLowerCase()); });
+$('loginPass').addEventListener('keydown', function(e){ if(e.key==='Enter') login($('loginUser').value.trim().toLowerCase()); });
+$('qlGrid').addEventListener('click', function(e){
+ var btn = e.target.closest('.ql-btn');
+ if(btn){
+  var u = btn.dataset.user;
+  $('loginUser').value = u;
+  $('loginPass').value = '********';
+  login(u);
+ }
+});
+
+function logout(){
+ sessionStorage.removeItem('bah_session');
+ currentUser = null;
+ $('app').classList.remove('visible');
+ $('loginPage').style.display='';
+ $('loginPage').classList.add('visible');
+ $('loginUser').value='';
+ $('loginPass').value='';
+ $('loginError').classList.remove('visible');
+}
+
+/* ========== SIDEBAR ========== */
+function buildSidebar(){
+ var openCount = tickets.filter(function(t){return t.status==='Open'}).length;
+ var incOpen = incidents.filter(function(i){return i.status==='Open'}).length;
+ var nav = [
+  {id:'dashboard',label:'Dashboard',icon:I.dash},
+  {section:'Ticketing'},
+  {id:'tickets',label:'All Tickets',icon:I.ticket,badge:openCount},
+  {section:'Compliance'},
+  {id:'policies',label:'Policies & SOPs',icon:I.policy},
+  {id:'incidents',label:'Incidents',icon:I.incident,badge:incOpen},
+  {id:'kpis',label:'KPI Dashboard',icon:I.kpi},
+  {section:'Resources'},
+  {id:'kb',label:'Knowledge Base',icon:I.kb}
+ ];
+ $('sbNav').innerHTML = nav.map(function(n){
+  if(n.section) return '<div class="sb-section">'+n.section+'</div>';
+  var badge = n.badge ? '<span class="badge">'+n.badge+'</span>' : '';
+  return '<div class="sb-link'+(n.id===currentView?' active':'')+'" data-view="'+n.id+'">'+n.icon+'<span>'+n.label+'</span>'+badge+'</div>';
+ }).join('');
+
+ $('sbUser').innerHTML = '<div class="sb-avatar" style="background:'+currentUser.color+'">'+currentUser.init+'</div><div class="sb-uinfo"><strong>'+currentUser.name+'</strong><span>'+currentUser.role+'</span></div><button class="sb-logout" id="logoutBtnSb">'+I.logout+'</button>';
+ $('logoutBtnSb').onclick = logout;
+}
+
+$('sbNav').addEventListener('click', function(e){
+ var link = e.target.closest('.sb-link');
+ if(link) navigate(link.dataset.view);
+});
+
+// Mobile sidebar
+$('menuToggle').addEventListener('click', function(){
+ $('sidebar').classList.toggle('open');
+ $('sbOverlay').classList.toggle('visible');
+});
+$('sbOverlay').addEventListener('click', function(){
+ $('sidebar').classList.remove('open');
+ $('sbOverlay').classList.remove('visible');
+});
+
+/* ========== ROUTER ========== */
+function navigate(view, detail){
+ currentView = view;
+ currentDetail = detail || null;
+ $('sidebar').classList.remove('open');
+ $('sbOverlay').classList.remove('visible');
+ buildSidebar();
+ renderView();
+ $('content').scrollTop = 0;
+}
+
+function renderView(){
+ switch(currentView){
+  case 'dashboard': renderDashboard(); break;
+  case 'tickets': currentDetail ? renderTicketDetail(currentDetail) : renderTickets(); break;
+  case 'policies': currentDetail ? renderPolicyDetail(currentDetail) : renderPolicies(); break;
+  case 'incidents': renderIncidents(); break;
+  case 'kpis': renderKPIs(); break;
+  case 'kb': currentDetail ? renderKBArticle(currentDetail) : renderKB(); break;
+  default: renderDashboard();
+ }
+}
+
+/* ========== VIEWS ========== */
+
+// --- DASHBOARD ---
+function renderDashboard(){
+ $('pageTitle').textContent = 'Dashboard';
+ $('topActions').innerHTML = '<button class="btn btn-primary btn-sm" id="dashNewTicket">'+I.plus+' New Ticket</button>';
+ var open = tickets.filter(function(t){return t.status==='Open'}).length;
+ var prog = tickets.filter(function(t){return t.status==='In Progress'}).length;
+ var resolved = tickets.filter(function(t){return t.status==='Resolved'||t.status==='Closed'}).length;
+ var critical = tickets.filter(function(t){return t.priority==='Critical'&&t.status!=='Closed'}).length;
+ var activePol = policies.filter(function(p){return p.status==='Active'}).length;
+ var openInc = incidents.filter(function(i){return i.status==='Open'||i.status==='Under Investigation'}).length;
+
+ var recent = tickets.slice().sort(function(a,b){return new Date(b.updated)-new Date(a.updated)}).slice(0,5);
+ var recentInc = incidents.slice().sort(function(a,b){return new Date(b.created)-new Date(a.created)}).slice(0,3);
+
+ var h = '<div class="cards">';
+ h += '<div class="card card-blue"><div class="label">Open Tickets</div><div class="value">'+open+'</div><div class="sub">Awaiting assignment</div></div>';
+ h += '<div class="card card-gold"><div class="label">In Progress</div><div class="value">'+prog+'</div><div class="sub">Being worked on</div></div>';
+ h += '<div class="card card-green"><div class="label">Resolved / Closed</div><div class="value">'+resolved+'</div><div class="sub">This period</div></div>';
+ h += '<div class="card card-red"><div class="label">Critical Issues</div><div class="value">'+critical+'</div><div class="sub">Immediate attention</div></div>';
+ h += '<div class="card card-teal"><div class="label">Active Policies</div><div class="value">'+activePol+'</div><div class="sub">'+policies.length+' total</div></div>';
+ h += '<div class="card card-purple"><div class="label">Open Incidents</div><div class="value">'+openInc+'</div><div class="sub">'+incidents.length+' total reported</div></div>';
+ h += '</div>';
+
+ // Recent Tickets
+ h += '<div class="tbl-wrap"><div class="tbl-head"><h3>Recent Tickets</h3><button class="btn btn-ghost btn-sm" id="dashViewAll">View All</button></div>';
+ h += '<table><thead><tr><th>ID</th><th>Title</th><th>Dept</th><th>Priority</th><th>Status</th><th>Updated</th></tr></thead><tbody>';
+ recent.forEach(function(t){
+  h += '<tr class="clickable" data-ticket="'+t.id+'"><td>'+t.id+'</td><td>'+t.title+'</td><td>'+t.dept+'</td><td><span class="badge badge-'+t.priority.toLowerCase()+'">'+t.priority+'</span></td><td><span class="badge badge-'+statusClass(t.status)+'">'+t.status+'</span></td><td>'+fmt(t.updated)+'</td></tr>';
+ });
+ h += '</tbody></table></div>';
+
+ // Recent Incidents
+ h += '<div class="tbl-wrap"><div class="tbl-head"><h3>Recent Incidents & Near Misses</h3><button class="btn btn-ghost btn-sm" id="dashViewInc">View All</button></div>';
+ h += '<table><thead><tr><th>ID</th><th>Title</th><th>Type</th><th>Severity</th><th>Status</th></tr></thead><tbody>';
+ recentInc.forEach(function(inc){
+  h += '<tr><td>'+inc.id+'</td><td>'+inc.title+'</td><td><span class="badge badge-'+inc.type.toLowerCase().replace(' ','-')+'">'+inc.type+'</span></td><td><span class="badge badge-'+inc.severity.toLowerCase()+'">'+inc.severity+'</span></td><td>'+inc.status+'</td></tr>';
+ });
+ h += '</tbody></table></div>';
+
+ $('content').innerHTML = h;
+
+ $('dashNewTicket').onclick = function(){ openNewTicketModal(); };
+ $('dashViewAll').onclick = function(){ navigate('tickets'); };
+ $('dashViewInc').onclick = function(){ navigate('incidents'); };
+ $('content').querySelectorAll('[data-ticket]').forEach(function(row){
+  row.onclick = function(){ navigate('tickets', this.dataset.ticket); };
+ });
+}
+
+function statusClass(s){
+ return {Open:'open','In Progress':'progress',Resolved:'resolved',Closed:'closed'}[s]||'open';
+}
+
+// --- TICKETS ---
+function renderTickets(){
+ $('pageTitle').textContent = 'All Tickets';
+ $('topActions').innerHTML = '<button class="btn btn-primary btn-sm" id="newTicketBtn">'+I.plus+' New Ticket</button>';
+
+ var h = '<div class="tbl-wrap"><div class="tbl-head"><h3>Tickets ('+tickets.length+')</h3><div class="tbl-filters">';
+ h += '<select id="fDept"><option value="">All Depts</option>'+DEPTS.map(function(d){return '<option>'+d+'</option>'}).join('')+'</select>';
+ h += '<select id="fStatus"><option value="">All Status</option>'+STATUSES.map(function(s){return '<option>'+s+'</option>'}).join('')+'</select>';
+ h += '<select id="fPriority"><option value="">All Priority</option>'+PRIORITIES.map(function(p){return '<option>'+p+'</option>'}).join('')+'</select>';
+ h += '<input type="text" id="fSearch" placeholder="Search...">';
+ h += '</div></div>';
+ h += '<table><thead><tr><th>ID</th><th>Title</th><th>Dept</th><th>Category</th><th>Priority</th><th>Status</th><th>Assignee</th><th>Updated</th></tr></thead>';
+ h += '<tbody id="ticketBody"></tbody></table></div>';
+
+ $('content').innerHTML = h;
+ $('newTicketBtn').onclick = function(){ openNewTicketModal(); };
+
+ function filterTickets(){
+  var dept = $('fDept').value;
+  var status = $('fStatus').value;
+  var pri = $('fPriority').value;
+  var q = $('fSearch').value.toLowerCase();
+  var filtered = tickets.filter(function(t){
+   if(dept && t.dept !== dept) return false;
+   if(status && t.status !== status) return false;
+   if(pri && t.priority !== pri) return false;
+   if(q && t.title.toLowerCase().indexOf(q)===-1 && t.id.toLowerCase().indexOf(q)===-1) return false;
+   return true;
+  }).sort(function(a,b){return new Date(b.updated)-new Date(a.updated)});
+
+  var tbody = $('ticketBody');
+  if(!filtered.length){
+   tbody.innerHTML = '<tr><td colspan="8" class="tbl-empty">No tickets match your filters.</td></tr>';
+   return;
+  }
+  tbody.innerHTML = filtered.map(function(t){
+   var assignee = t.assignee ? (USERS[t.assignee]||{}).name||t.assignee : '<span style="color:var(--g300)">Unassigned</span>';
+   return '<tr class="clickable" data-ticket="'+t.id+'"><td>'+t.id+'</td><td>'+t.title+'</td><td>'+t.dept+'</td><td>'+t.category+'</td><td><span class="badge badge-'+t.priority.toLowerCase()+'">'+t.priority+'</span></td><td><span class="badge badge-'+statusClass(t.status)+'">'+t.status+'</span></td><td>'+assignee+'</td><td>'+fmt(t.updated)+'</td></tr>';
+  }).join('');
+
+  tbody.querySelectorAll('[data-ticket]').forEach(function(row){
+   row.onclick = function(){ navigate('tickets', this.dataset.ticket); };
+  });
+ }
+
+ filterTickets();
+ ['fDept','fStatus','fPriority'].forEach(function(id){ $(id).onchange = filterTickets; });
+ $('fSearch').oninput = filterTickets;
+}
+
+// --- TICKET DETAIL ---
+function renderTicketDetail(id){
+ var t = tickets.find(function(tk){return tk.id===id});
+ if(!t){ renderTickets(); return; }
+ $('pageTitle').textContent = t.id + ' - ' + t.title;
+ $('topActions').innerHTML = '<button class="btn btn-ghost btn-sm" id="backToTickets">'+I.back+' Back</button>';
+
+ var assignee = t.assignee ? (USERS[t.assignee]||{}).name||t.assignee : 'Unassigned';
+ var reporter = (USERS[t.reporter]||{}).name||t.reporter;
+
+ var h = '<div class="detail-card"><div class="detail-header"><div><h3>'+t.title+'</h3><span class="badge badge-'+statusClass(t.status)+'" style="margin-top:.3rem;display:inline-block">'+t.status+'</span> <span class="badge badge-'+t.priority.toLowerCase()+'">'+t.priority+'</span></div>';
+ h += '<div style="display:flex;gap:.4rem;flex-wrap:wrap">';
+ if(t.status!=='Closed'){
+  h += '<button class="btn btn-sm btn-secondary" id="updateStatusBtn">Update Status</button>';
+  if(!t.assignee) h += '<button class="btn btn-sm btn-primary" id="assignSelfBtn">Assign to Me</button>';
+ }
+ h += '</div></div>';
+ h += '<div class="detail-body"><div class="detail-grid">';
+ h += '<div class="detail-field"><div class="df-label">Department</div><div class="df-value">'+t.dept+'</div></div>';
+ h += '<div class="detail-field"><div class="df-label">Category</div><div class="df-value">'+t.category+'</div></div>';
+ h += '<div class="detail-field"><div class="df-label">Reporter</div><div class="df-value">'+reporter+'</div></div>';
+ h += '<div class="detail-field"><div class="df-label">Assignee</div><div class="df-value">'+assignee+'</div></div>';
+ h += '<div class="detail-field"><div class="df-label">Location</div><div class="df-value">'+(t.location||'-')+'</div></div>';
+ h += '<div class="detail-field"><div class="df-label">Asset</div><div class="df-value">'+(t.asset||'-')+'</div></div>';
+ h += '<div class="detail-field"><div class="df-label">Created</div><div class="df-value">'+fmtTime(t.created)+'</div></div>';
+ h += '<div class="detail-field"><div class="df-label">Last Updated</div><div class="df-value">'+fmtTime(t.updated)+'</div></div>';
+ h += '</div>';
+ h += '<h4 style="font-size:.8rem;font-weight:600;margin-bottom:.4rem">Description</h4><p style="font-size:.85rem;line-height:1.5;color:var(--g600);margin-bottom:1rem">'+t.description+'</p>';
+
+ // Add comment
+ if(t.status!=='Closed'){
+  h += '<div style="margin-bottom:1rem"><label style="font-size:.75rem;font-weight:600;color:var(--g500);display:block;margin-bottom:.25rem">Add Comment</label>';
+  h += '<div style="display:flex;gap:.4rem"><input type="text" id="commentInput" placeholder="Type a comment..." style="flex:1;padding:.45rem .6rem;font-size:.8rem;border:1.5px solid var(--g100);border-radius:6px;outline:none;font-family:var(--font)"><button class="btn btn-primary btn-sm" id="addCommentBtn">Add</button></div></div>';
+ }
+
+ // Timeline
+ h += '<h4 style="font-size:.8rem;font-weight:600;margin-bottom:.25rem">Activity Timeline</h4>';
+ h += '<div class="timeline">';
+ t.timeline.forEach(function(tl){
+  h += '<div class="tl-item"><div class="tl-time">'+fmtTime(tl.time)+'</div><div class="tl-text">'+tl.text+'</div><div class="tl-user">'+tl.user+'</div></div>';
+ });
+ h += '</div></div></div>';
+
+ $('content').innerHTML = h;
+
+ $('backToTickets').onclick = function(){ navigate('tickets'); };
+
+ if($('updateStatusBtn')){
+  $('updateStatusBtn').onclick = function(){
+   var opts = STATUSES.filter(function(s){return s!==t.status}).map(function(s){return '<option value="'+s+'">'+s+'</option>'}).join('');
+   openModal('Update Status', '<div class="form-group"><label>New Status</label><select id="newStatusSel">'+opts+'</select></div><div class="form-group"><label>Note (optional)</label><input type="text" id="statusNote" placeholder="Add a note..."></div>', '<button class="btn btn-secondary btn-sm" onclick="document.getElementById(\'modalOverlay\').classList.remove(\'visible\')">Cancel</button><button class="btn btn-primary btn-sm" id="confirmStatus">Update</button>');
+   $('confirmStatus').onclick = function(){
+    var newSt = $('newStatusSel').value;
+    var note = $('statusNote').value;
+    t.status = newSt;
+    t.updated = new Date();
+    t.timeline.push({time:new Date(), text:'Status changed to '+newSt+(note?' - '+note:''), user:currentUser.name});
+    closeModal();
+    toast('Ticket status updated to '+newSt, 'success');
+    navigate('tickets', t.id);
+   };
+  };
+ }
+
+ if($('assignSelfBtn')){
+  $('assignSelfBtn').onclick = function(){
+   t.assignee = currentUser.username;
+   t.updated = new Date();
+   t.timeline.push({time:new Date(), text:'Assigned to '+currentUser.name, user:currentUser.name});
+   toast('Ticket assigned to you', 'success');
+   navigate('tickets', t.id);
+  };
+ }
+
+ if($('addCommentBtn')){
+  $('addCommentBtn').onclick = function(){
+   var c = $('commentInput').value.trim();
+   if(!c) return;
+   t.timeline.push({time:new Date(), text:c, user:currentUser.name});
+   t.updated = new Date();
+   toast('Comment added', 'success');
+   navigate('tickets', t.id);
+  };
+ }
+}
+
+// --- NEW TICKET MODAL ---
+function openNewTicketModal(){
+ var h = '<div class="form-group"><label>Title *</label><input type="text" id="ntTitle" placeholder="Brief description of the issue"></div>';
+ h += '<div class="form-row"><div class="form-group"><label>Department *</label><select id="ntDept"><option value="">Select...</option>'+DEPTS.map(function(d){return '<option>'+d+'</option>'}).join('')+'</select></div>';
+ h += '<div class="form-group"><label>Category *</label><select id="ntCat"><option value="">Select dept first</option></select></div></div>';
+ h += '<div class="form-row"><div class="form-group"><label>Priority *</label><select id="ntPri">'+PRIORITIES.map(function(p){return '<option>'+p+'</option>'}).join('')+'</select></div>';
+ h += '<div class="form-group"><label>Location</label><input type="text" id="ntLoc" placeholder="e.g. Ward 3, ICU"></div></div>';
+ h += '<div class="form-group"><label>Asset (if applicable)</label><input type="text" id="ntAsset" placeholder="Equipment name or ID"></div>';
+ h += '<div class="form-group"><label>Description *</label><textarea id="ntDesc" placeholder="Detailed explanation of the issue..."></textarea></div>';
+
+ openModal('New Ticket', h, '<button class="btn btn-secondary btn-sm" onclick="document.getElementById(\'modalOverlay\').classList.remove(\'visible\')">Cancel</button><button class="btn btn-primary btn-sm" id="submitTicket">Submit Ticket</button>');
+
+ $('ntDept').onchange = function(){
+  var cats = CATEGORIES[this.value] || [];
+  $('ntCat').innerHTML = '<option value="">Select...</option>' + cats.map(function(c){return '<option>'+c+'</option>'}).join('');
+ };
+
+ $('submitTicket').onclick = function(){
+  var title = $('ntTitle').value.trim();
+  var dept = $('ntDept').value;
+  var cat = $('ntCat').value;
+  var pri = $('ntPri').value;
+  if(!title||!dept||!cat){ toast('Please fill all required fields','error'); return; }
+  var ticket = {
+   id:genId(), title:title, dept:dept, category:cat, priority:pri,
+   status:'Open', reporter:currentUser.username, assignee:null,
+   created:new Date(), updated:new Date(),
+   description:$('ntDesc').value.trim()||'No description provided.',
+   asset:$('ntAsset').value.trim()||null,
+   location:$('ntLoc').value.trim()||null,
+   timeline:[{time:new Date(), text:'Ticket created', user:currentUser.name}]
+  };
+  tickets.unshift(ticket);
+  closeModal();
+  toast('Ticket '+ticket.id+' created successfully','success');
+  navigate('tickets', ticket.id);
+ };
+}
+
+// --- POLICIES & SOPs ---
+function renderPolicies(){
+ $('pageTitle').textContent = 'Policies & SOPs';
+ $('topActions').innerHTML = '';
+
+ var h = '<div class="tbl-wrap"><div class="tbl-head"><h3>Policies ('+policies.length+')</h3><div class="tbl-filters"><select id="pFilter"><option value="">All Status</option><option>Active</option><option>Draft</option><option>Under Review</option></select></div></div>';
+ h += '<table><thead><tr><th>ID</th><th>Title</th><th>Dept</th><th>Version</th><th>Status</th><th>Last Reviewed</th><th>Attestation</th></tr></thead>';
+ h += '<tbody id="polBody"></tbody></table></div>';
+
+ h += '<div class="tbl-wrap"><div class="tbl-head"><h3>Standard Operating Procedures ('+sops.length+')</h3></div>';
+ h += '<table><thead><tr><th>ID</th><th>Title</th><th>Dept</th><th>Version</th><th>Description</th></tr></thead><tbody>';
+ sops.forEach(function(s){
+  h += '<tr><td>'+s.id+'</td><td>'+s.title+'</td><td>'+s.dept+'</td><td>v'+s.version+'</td><td style="max-width:300px">'+s.description.substring(0,80)+'...</td></tr>';
+ });
+ h += '</tbody></table></div>';
+
+ $('content').innerHTML = h;
+
+ function renderPolTable(){
+  var f = $('pFilter').value;
+  var list = f ? policies.filter(function(p){return p.status===f}) : policies;
+  var tbody = $('polBody');
+  tbody.innerHTML = list.map(function(p){
+   var total = p.attested.length + p.pending.length;
+   var pct = total ? Math.round(p.attested.length/total*100) : 0;
+   var sc = p.status==='Active'?'active':p.status==='Draft'?'draft':'review';
+   return '<tr class="clickable" data-pol="'+p.id+'"><td>'+p.id+'</td><td>'+p.title+'</td><td>'+p.dept+'</td><td>v'+p.version+'</td><td><span class="badge badge-'+sc+'">'+p.status+'</span></td><td>'+fmt(p.reviewed)+'</td><td>'+pct+'% ('+p.attested.length+'/'+total+')</td></tr>';
+  }).join('');
+  tbody.querySelectorAll('[data-pol]').forEach(function(row){
+   row.onclick = function(){ navigate('policies', this.dataset.pol); };
+  });
+ }
+ renderPolTable();
+ $('pFilter').onchange = renderPolTable;
+}
+
+function renderPolicyDetail(id){
+ var p = policies.find(function(pol){return pol.id===id});
+ if(!p){ renderPolicies(); return; }
+ $('pageTitle').textContent = p.id + ' - ' + p.title;
+ $('topActions').innerHTML = '<button class="btn btn-ghost btn-sm" id="backPol">'+I.back+' Back</button>';
+
+ var sc = p.status==='Active'?'active':p.status==='Draft'?'draft':'review';
+ var canAttest = p.pending.indexOf(currentUser.username) !== -1;
+
+ var h = '<div class="detail-card"><div class="detail-header"><div><h3>'+p.title+'</h3><span class="badge badge-'+sc+'" style="margin-top:.3rem;display:inline-block">'+p.status+'</span></div>';
+ if(canAttest) h += '<button class="btn btn-primary btn-sm" id="attestBtn">I Have Read & Understood</button>';
+ h += '</div><div class="detail-body">';
+ h += '<div class="detail-grid">';
+ h += '<div class="detail-field"><div class="df-label">Department</div><div class="df-value">'+p.dept+'</div></div>';
+ h += '<div class="detail-field"><div class="df-label">Version</div><div class="df-value">v'+p.version+'</div></div>';
+ h += '<div class="detail-field"><div class="df-label">Author</div><div class="df-value">'+p.author+'</div></div>';
+ h += '<div class="detail-field"><div class="df-label">Created</div><div class="df-value">'+fmt(p.created)+'</div></div>';
+ h += '<div class="detail-field"><div class="df-label">Last Reviewed</div><div class="df-value">'+fmt(p.reviewed)+'</div></div>';
+ h += '<div class="detail-field"><div class="df-label">Next Review</div><div class="df-value">'+fmt(p.nextReview)+'</div></div>';
+ h += '</div>';
+ h += '<h4 style="font-size:.85rem;font-weight:600;margin-bottom:.4rem">Description</h4><p style="font-size:.85rem;line-height:1.5;color:var(--g600)">'+p.description+'</p>';
+
+ // Attestation tracking
+ h += '<h4 style="font-size:.85rem;font-weight:600;margin:1rem 0 .4rem">Staff Attestation</h4>';
+ h += '<div class="attest-list">';
+ p.attested.forEach(function(u){
+  var name = (USERS[u]||{}).name||u;
+  h += '<div class="attest-row"><span class="attest-check">&#10003;</span> '+name+' <span style="color:var(--g300);margin-left:auto;font-size:.7rem">Attested</span></div>';
+ });
+ p.pending.forEach(function(u){
+  var name = (USERS[u]||{}).name||u;
+  h += '<div class="attest-row"><span class="attest-pending">&#9711;</span> '+name+' <span style="color:var(--orange);margin-left:auto;font-size:.7rem">Pending</span></div>';
+ });
+ h += '</div></div></div>';
+
+ $('content').innerHTML = h;
+ $('backPol').onclick = function(){ navigate('policies'); };
+
+ if($('attestBtn')){
+  $('attestBtn').onclick = function(){
+   var idx = p.pending.indexOf(currentUser.username);
+   if(idx>-1){
+    p.pending.splice(idx,1);
+    p.attested.push(currentUser.username);
+    toast('Attestation recorded','success');
+    navigate('policies',p.id);
+   }
+  };
+ }
+}
+
+// --- INCIDENTS ---
+function renderIncidents(){
+ $('pageTitle').textContent = 'Incidents & Near Misses';
+ $('topActions').innerHTML = '<button class="btn btn-primary btn-sm" id="newIncBtn">'+I.plus+' Report Incident</button>';
+
+ var h = '<div class="cards">';
+ var total = incidents.length;
+ var nms = incidents.filter(function(i){return i.type==='Near Miss'}).length;
+ var incs = incidents.filter(function(i){return i.type==='Incident'}).length;
+ var openI = incidents.filter(function(i){return i.status==='Open'||i.status==='Under Investigation'}).length;
+ h += '<div class="card card-gold"><div class="label">Total Reports</div><div class="value">'+total+'</div></div>';
+ h += '<div class="card card-blue"><div class="label">Near Misses</div><div class="value">'+nms+'</div></div>';
+ h += '<div class="card card-red"><div class="label">Incidents</div><div class="value">'+incs+'</div></div>';
+ h += '<div class="card card-purple"><div class="label">Open / Investigating</div><div class="value">'+openI+'</div></div>';
+ h += '</div>';
+
+ h += '<div class="tbl-wrap"><div class="tbl-head"><h3>All Reports</h3><div class="tbl-filters"><select id="incTypeF"><option value="">All Types</option><option>Near Miss</option><option>Incident</option></select><select id="incSevF"><option value="">All Severity</option><option>Low</option><option>Medium</option><option>High</option><option>Critical</option></select></div></div>';
+ h += '<table><thead><tr><th>ID</th><th>Title</th><th>Type</th><th>Severity</th><th>Dept</th><th>Status</th><th>Reported</th><th>Anonymous</th></tr></thead>';
+ h += '<tbody id="incBody"></tbody></table></div>';
+
+ $('content').innerHTML = h;
+ $('newIncBtn').onclick = openNewIncidentModal;
+
+ function filterInc(){
+  var type = $('incTypeF').value;
+  var sev = $('incSevF').value;
+  var list = incidents.filter(function(i){
+   if(type && i.type!==type) return false;
+   if(sev && i.severity!==sev) return false;
+   return true;
+  }).sort(function(a,b){return new Date(b.created)-new Date(a.created)});
+
+  $('incBody').innerHTML = list.length ? list.map(function(i){
+   var tc = i.type==='Near Miss'?'near-miss':'incident';
+   return '<tr class="clickable" data-inc="'+i.id+'"><td>'+i.id+'</td><td>'+i.title+'</td><td><span class="badge badge-'+tc+'">'+i.type+'</span></td><td><span class="badge badge-'+i.severity.toLowerCase()+'">'+i.severity+'</span></td><td>'+i.dept+'</td><td>'+i.status+'</td><td>'+fmt(i.created)+'</td><td>'+(i.anonymous?'Yes':'No')+'</td></tr>';
+  }).join('') : '<tr><td colspan="8" class="tbl-empty">No reports found.</td></tr>';
+
+  $('incBody').querySelectorAll('[data-inc]').forEach(function(row){
+   row.onclick = function(){ openIncidentDetail(this.dataset.inc); };
+  });
+ }
+ filterInc();
+ $('incTypeF').onchange = filterInc;
+ $('incSevF').onchange = filterInc;
+}
+
+function openIncidentDetail(id){
+ var inc = incidents.find(function(i){return i.id===id});
+ if(!inc) return;
+ var reporter = inc.anonymous ? 'Anonymous' : ((USERS[inc.reporter]||{}).name||inc.reporter);
+ var h = '<div class="detail-grid">';
+ h += '<div class="detail-field"><div class="df-label">Type</div><div class="df-value">'+inc.type+'</div></div>';
+ h += '<div class="detail-field"><div class="df-label">Severity</div><div class="df-value">'+inc.severity+'</div></div>';
+ h += '<div class="detail-field"><div class="df-label">Department</div><div class="df-value">'+inc.dept+'</div></div>';
+ h += '<div class="detail-field"><div class="df-label">Status</div><div class="df-value">'+inc.status+'</div></div>';
+ h += '<div class="detail-field"><div class="df-label">Reporter</div><div class="df-value">'+reporter+'</div></div>';
+ h += '<div class="detail-field"><div class="df-label">Date Reported</div><div class="df-value">'+fmtTime(inc.created)+'</div></div>';
+ h += '</div>';
+ h += '<h4 style="font-size:.85rem;font-weight:600;margin:.75rem 0 .3rem">Description</h4><p style="font-size:.85rem;line-height:1.5;color:var(--g600)">'+inc.description+'</p>';
+ if(inc.actions){
+  h += '<h4 style="font-size:.85rem;font-weight:600;margin:.75rem 0 .3rem">Corrective Actions</h4><p style="font-size:.85rem;line-height:1.5;color:var(--g600)">'+inc.actions+'</p>';
+ }
+ // Status update
+ if(inc.status !== 'Closed'){
+  h += '<div class="form-group" style="margin-top:1rem"><label>Update Status</label><select id="incStatusSel"><option value="">Select...</option><option>Open</option><option>Under Investigation</option><option>Resolved</option><option>Closed</option></select></div>';
+ }
+
+ var footer = '';
+ if(inc.status !== 'Closed'){
+  footer = '<button class="btn btn-secondary btn-sm" onclick="document.getElementById(\'modalOverlay\').classList.remove(\'visible\')">Close</button><button class="btn btn-primary btn-sm" id="updateIncStatus">Update</button>';
+ } else {
+  footer = '<button class="btn btn-secondary btn-sm" onclick="document.getElementById(\'modalOverlay\').classList.remove(\'visible\')">Close</button>';
+ }
+
+ openModal(inc.id + ' - ' + inc.title, h, footer);
+
+ if($('updateIncStatus')){
+  $('updateIncStatus').onclick = function(){
+   var ns = $('incStatusSel').value;
+   if(!ns){ toast('Select a status','error'); return; }
+   inc.status = ns;
+   closeModal();
+   toast('Incident status updated','success');
+   renderIncidents();
+  };
+ }
+}
+
+function openNewIncidentModal(){
+ var h = '<div class="form-group"><label>Title *</label><input type="text" id="niTitle" placeholder="Brief description"></div>';
+ h += '<div class="form-row"><div class="form-group"><label>Type *</label><select id="niType"><option>Near Miss</option><option>Incident</option></select></div>';
+ h += '<div class="form-group"><label>Severity *</label><select id="niSev">'+['Low','Medium','High','Critical'].map(function(s){return '<option>'+s+'</option>'}).join('')+'</select></div></div>';
+ h += '<div class="form-row"><div class="form-group"><label>Department *</label><select id="niDept"><option value="">Select...</option>'+['Clinical','IT','Maintenance','Procurement','Administration'].map(function(d){return '<option>'+d+'</option>'}).join('')+'</select></div>';
+ h += '<div class="form-group"><label>Report Anonymously</label><select id="niAnon"><option value="false">No</option><option value="true">Yes</option></select></div></div>';
+ h += '<div class="form-group"><label>Description *</label><textarea id="niDesc" placeholder="What happened? Include details about time, location, and people involved..."></textarea></div>';
+ h += '<div class="form-group"><label>Immediate Actions Taken</label><textarea id="niActions" placeholder="What actions were taken immediately after the event?"></textarea></div>';
+
+ openModal('Report Incident / Near Miss', h, '<button class="btn btn-secondary btn-sm" onclick="document.getElementById(\'modalOverlay\').classList.remove(\'visible\')">Cancel</button><button class="btn btn-primary btn-sm" id="submitInc">Submit Report</button>');
+
+ $('submitInc').onclick = function(){
+  var title = $('niTitle').value.trim();
+  var dept = $('niDept').value;
+  var desc = $('niDesc').value.trim();
+  if(!title||!dept||!desc){ toast('Please fill all required fields','error'); return; }
+  incidents.unshift({
+   id:genIncId(), type:$('niType').value, severity:$('niSev').value,
+   title:title, dept:dept, reporter:currentUser.username,
+   created:new Date(), description:desc, status:'Open',
+   anonymous:$('niAnon').value==='true',
+   actions:$('niActions').value.trim()||null
+  });
+  closeModal();
+  toast('Incident report submitted','success');
+  navigate('incidents');
+ };
+}
+
+// --- KPIs ---
+function renderKPIs(){
+ $('pageTitle').textContent = 'KPI Dashboard';
+ $('topActions').innerHTML = '';
+
+ var totalT = tickets.length;
+ var resolved = tickets.filter(function(t){return t.status==='Resolved'||t.status==='Closed'}).length;
+ var resRate = totalT ? Math.round(resolved/totalT*100) : 0;
+
+ var critOpen = tickets.filter(function(t){return t.priority==='Critical'&&(t.status==='Open'||t.status==='In Progress')}).length;
+ var critTotal = tickets.filter(function(t){return t.priority==='Critical'}).length;
+ var critRes = critTotal ? Math.round((critTotal-critOpen)/critTotal*100) : 100;
+
+ var totalPol = policies.length;
+ var activePol = policies.filter(function(p){return p.status==='Active'}).length;
+ var polRate = totalPol ? Math.round(activePol/totalPol*100) : 0;
+
+ var totalAttest = 0, doneAttest = 0;
+ policies.forEach(function(p){ totalAttest += p.attested.length + p.pending.length; doneAttest += p.attested.length; });
+ var attestRate = totalAttest ? Math.round(doneAttest/totalAttest*100) : 0;
+
+ var totalInc = incidents.length;
+ var closedInc = incidents.filter(function(i){return i.status==='Closed'||i.status==='Resolved'}).length;
+ var incCloseRate = totalInc ? Math.round(closedInc/totalInc*100) : 0;
+
+ var nmCount = incidents.filter(function(i){return i.type==='Near Miss'}).length;
+ var reportRate = totalInc > 0 ? Math.round(nmCount/totalInc*100) : 0;
+
+ // Per department
+ var deptStats = {};
+ DEPTS.forEach(function(d){
+  var dt = tickets.filter(function(t){return t.dept===d});
+  var dr = dt.filter(function(t){return t.status==='Resolved'||t.status==='Closed'}).length;
+  deptStats[d] = {total:dt.length, resolved:dr, rate:dt.length?Math.round(dr/dt.length*100):0};
+ });
+
+ function bar(label,val,color){
+  var c = color || 'var(--teal)';
+  return '<div class="kpi-row"><div class="kpi-label">'+label+'</div><div class="kpi-bar"><div class="kpi-fill" style="width:'+val+'%;background:'+c+'"></div></div><div class="kpi-val" style="color:'+c+'">'+val+'%</div></div>';
+ }
+
+ var h = '<div class="cards">';
+ h += '<div class="card card-teal"><div class="label">Ticket Resolution Rate</div><div class="value">'+resRate+'%</div><div class="sub">'+resolved+' of '+totalT+' resolved</div></div>';
+ h += '<div class="card card-red"><div class="label">Critical Response</div><div class="value">'+critRes+'%</div><div class="sub">'+critOpen+' critical still open</div></div>';
+ h += '<div class="card card-blue"><div class="label">Policy Compliance</div><div class="value">'+polRate+'%</div><div class="sub">'+activePol+' of '+totalPol+' active</div></div>';
+ h += '<div class="card card-gold"><div class="label">Attestation Rate</div><div class="value">'+attestRate+'%</div><div class="sub">'+doneAttest+' of '+totalAttest+' completed</div></div>';
+ h += '<div class="card card-green"><div class="label">Incident Close Rate</div><div class="value">'+incCloseRate+'%</div><div class="sub">'+closedInc+' of '+totalInc+' closed</div></div>';
+ h += '<div class="card card-purple"><div class="label">Near Miss Reporting</div><div class="value">'+reportRate+'%</div><div class="sub">'+nmCount+' near misses of '+totalInc+' reports</div></div>';
+ h += '</div>';
+
+ // Department breakdown
+ h += '<div class="kpi-card"><h4>Ticket Resolution by Department</h4>';
+ DEPTS.forEach(function(d){
+  var s = deptStats[d];
+  var c = d==='IT'?'var(--blue)':d==='Maintenance'?'var(--gold)':'var(--teal)';
+  h += bar(d+' ('+s.resolved+'/'+s.total+')', s.rate, c);
+ });
+ h += '</div>';
+
+ // Policy attestation breakdown
+ h += '<div class="kpi-card"><h4>Policy Attestation Progress</h4>';
+ policies.forEach(function(p){
+  var total = p.attested.length + p.pending.length;
+  var pct = total ? Math.round(p.attested.length/total*100) : 0;
+  var c = pct===100?'var(--green)':pct>=50?'var(--gold)':'var(--red)';
+  h += bar(p.id+': '+p.title.substring(0,30)+(p.title.length>30?'...':''), pct, c);
+ });
+ h += '</div>';
+
+ // Incident severity breakdown
+ h += '<div class="kpi-card"><h4>Incident Severity Distribution</h4>';
+ ['Low','Medium','High','Critical'].forEach(function(s){
+  var count = incidents.filter(function(i){return i.severity===s}).length;
+  var pct = totalInc ? Math.round(count/totalInc*100) : 0;
+  var c = s==='Low'?'var(--green)':s==='Medium'?'var(--gold)':s==='High'?'var(--orange)':'var(--red)';
+  h += bar(s+' ('+count+')', pct, c);
+ });
+ h += '</div>';
+
+ $('content').innerHTML = h;
+}
+
+// --- KNOWLEDGE BASE ---
+function renderKB(){
+ $('pageTitle').textContent = 'Knowledge Base';
+ $('topActions').innerHTML = '';
+
+ var h = '<div style="margin-bottom:1rem"><input type="text" id="kbSearch" placeholder="Search articles..." style="width:100%;max-width:400px;padding:.55rem .75rem;font-size:.85rem;border:1.5px solid var(--g100);border-radius:var(--radius);outline:none;font-family:var(--font)"></div>';
+ h += '<div class="kb-grid" id="kbGrid"></div>';
+
+ $('content').innerHTML = h;
+
+ function renderCards(q){
+  var list = kbArticles;
+  if(q){
+   q = q.toLowerCase();
+   list = list.filter(function(a){return a.title.toLowerCase().indexOf(q)>-1||a.category.toLowerCase().indexOf(q)>-1});
+  }
+  $('kbGrid').innerHTML = list.length ? list.map(function(a){
+   var preview = a.content.replace(/<[^>]+>/g,'').substring(0,100)+'...';
+   return '<div class="kb-card" data-kb="'+a.id+'"><h4>'+a.title+'</h4><p>'+preview+'</p><div class="kb-meta">'+a.category+'</div></div>';
+  }).join('') : '<p style="color:var(--g300);font-size:.85rem">No articles match your search.</p>';
+
+  $('kbGrid').querySelectorAll('[data-kb]').forEach(function(card){
+   card.onclick = function(){ navigate('kb', this.dataset.kb); };
+  });
+ }
+ renderCards('');
+ $('kbSearch').oninput = function(){ renderCards(this.value.trim()); };
+}
+
+function renderKBArticle(id){
+ var a = kbArticles.find(function(art){return art.id===id});
+ if(!a){ renderKB(); return; }
+ $('pageTitle').textContent = a.title;
+ $('topActions').innerHTML = '<button class="btn btn-ghost btn-sm" id="backKB">'+I.back+' Back to Articles</button>';
+
+ $('content').innerHTML = '<div class="kb-article"><div class="kb-meta" style="margin-bottom:.75rem">'+a.category+'</div><h3>'+a.title+'</h3>'+a.content+'</div>';
+ $('backKB').onclick = function(){ navigate('kb'); };
+}
+
+/* ========== APP INIT ========== */
+function buildApp(){
+ buildSidebar();
+}
+
+/* ========== SPLASH & SESSION ========== */
+buildLoginButtons();
+
+var resumed = false;
+try {
+ var saved = sessionStorage.getItem('bah_session');
+ if(saved){
+  var s = JSON.parse(saved);
+  if(USERS[s.username]){
+   resumed = true;
+   currentUser = s;
+   $('splash').classList.add('hidden');
+   $('splash').style.display='none';
+   $('loginPage').style.display='none';
+   $('app').classList.add('visible');
+   buildApp();
+   navigate('dashboard');
+  }
+ }
+} catch(e){}
+
+if(!resumed){
+ setTimeout(function(){
+  $('splash').classList.add('hidden');
+  setTimeout(function(){ $('splash').style.display='none'; },600);
+  $('loginPage').classList.add('visible');
+ }, 2500);
+}
+
+})();
+</script>
+</body>
+</html>
