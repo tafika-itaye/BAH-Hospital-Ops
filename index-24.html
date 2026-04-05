@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <title>Blantyre Adventist Hospital — Operations Platform</title>
+    <meta name="description" content="Blantyre Adventist Hospital Operations Platform. Secure staff login for ticketing and compliance systems.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bah-navy: #0B2545;
+            --bah-blue: #13538A;
+            --bah-teal: #1B7A6E;
+            --bah-teal-light: #23A08D;
+            --bah-gold: #C6922A;
+            --bah-white: #FAFBFC;
+            --bah-gray-50: #F4F5F7;
+            --bah-gray-100: #E8EAED;
+            --bah-gray-300: #B0B7C3;
+            --bah-gray-600: #5A6377;
+            --bah-gray-800: #2D3340;
+            --bah-red: #C0392B;
+            --bah-shadow-lg: 0 12px 48px rgba(11, 37, 69, 0.15);
+            --font-display: 'Playfair Display', Georgia, serif;
+            --font-body: 'DM Sans', system-ui, sans-serif;
+            --radius: 10px;
+            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        html {
+            font-size: 16px;
+            height: 100%;
+        }
+
+        body {
+            font-family: var(--font-body);
+            color: var(--bah-gray-800);
+            background: var(--bah-navy);
+            min-height: 100%;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 2rem 1rem 3rem;
+            overflow-x: hidden;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Background layer (not on body pseudo-elements - fixes mobile Safari scroll) */
+        .bg-layer {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .bg-layer::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(27, 122, 110, 0.15) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(19, 83, 138, 0.20) 0%, transparent 50%),
+                radial-gradient(ellipse at 60% 90%, rgba(198, 146, 42, 0.08) 0%, transparent 40%);
+        }
+
+        .bg-layer::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        /* ===================== SPLASH SCREEN ===================== */
+        .splash {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 9999;
+            background: var(--bah-navy);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .splash.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .splash-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--bah-teal), var(--bah-teal-light));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 12px 32px rgba(27, 122, 110, 0.35);
+            animation: splashPulse 1.8s ease-in-out infinite;
+        }
+
+        .splash-icon svg {
+            width: 42px;
+            height: 42px;
+            fill: white;
+        }
+
+        @keyframes splashPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 12px 32px rgba(27, 122, 110, 0.35); }
+            50% { transform: scale(1.05); box-shadow: 0 16px 40px rgba(27, 122, 110, 0.45); }
+        }
+
+        .splash-title {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            text-align: center;
+            margin-bottom: 0.4rem;
+        }
+
+        .splash-subtitle {
+            font-family: var(--font-body);
+            font-size: 0.875rem;
+            color: var(--bah-gray-300);
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .splash-loader {
+            width: 120px;
+            height: 3px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .splash-loader-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--bah-teal), var(--bah-teal-light));
+            border-radius: 3px;
+            animation: splashLoad 2.2s ease-in-out forwards;
+        }
+
+        @keyframes splashLoad {
+            0% { width: 0%; }
+            40% { width: 60%; }
+            80% { width: 90%; }
+            100% { width: 100%; }
+        }
+
+        .splash-credit {
+            font-size: 0.6875rem;
+            color: rgba(255,255,255,0.25);
+            position: absolute;
+            bottom: 2rem;
+        }
+
+        /* ===================== LOGIN CONTAINER ===================== */
+        .login-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 440px;
+            margin: 0 auto;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease 0.1s, transform 0.5s ease 0.1s;
+        }
+
+        .login-container.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Hospital branding header */
+        .brand {
+            text-align: center;
+            margin-bottom: 1.75rem;
+        }
+
+        .brand-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--bah-teal), var(--bah-teal-light));
+            border-radius: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            box-shadow: 0 8px 24px rgba(27, 122, 110, 0.3);
+        }
+
+        .brand-icon svg {
+            width: 34px;
+            height: 34px;
+            fill: white;
+        }
+
+        .brand h1 {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--bah-white);
+            letter-spacing: -0.01em;
+            line-height: 1.3;
+        }
+
+        .brand p {
+            font-size: 0.875rem;
+            color: var(--bah-gray-300);
+            margin-top: 0.3rem;
+        }
+
+        /* Card */
+        .login-card {
+            background: var(--bah-white);
+            border-radius: 16px;
+            padding: 2rem 1.75rem 1.75rem;
+            box-shadow: var(--bah-shadow-lg);
+        }
+
+        .login-card h2 {
+            font-family: var(--font-body);
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--bah-gray-800);
+            margin-bottom: 1.25rem;
+        }
+
+        /* Form groups */
+        .form-group {
+            margin-bottom: 1.125rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: var(--bah-gray-600);
+            margin-bottom: 0.35rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .input-wrap {
+            position: relative;
+        }
+
+        .input-wrap > svg.input-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            stroke: var(--bah-gray-300);
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: stroke var(--transition);
+            pointer-events: none;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="password"] {
+            width: 100%;
+            padding: 0.7rem 0.875rem 0.7rem 2.75rem;
+            font-family: var(--font-body);
+            font-size: 0.9375rem;
+            color: var(--bah-gray-800);
+            background: var(--bah-gray-50);
+            border: 1.5px solid var(--bah-gray-100);
+            border-radius: var(--radius);
+            outline: none;
+            transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+            -webkit-appearance: none;
+        }
+
+        .form-group input:focus {
+            border-color: var(--bah-teal);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(27, 122, 110, 0.10);
+        }
+
+        .form-group input:focus ~ svg.input-icon {
+            stroke: var(--bah-teal);
+        }
+
+        .form-group input::placeholder {
+            color: var(--bah-gray-300);
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+        }
+
+        .toggle-password svg {
+            width: 18px;
+            height: 18px;
+            stroke: var(--bah-gray-300);
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: stroke var(--transition);
+        }
+
+        .toggle-password:hover svg {
+            stroke: var(--bah-gray-600);
+        }
+
+        /* Remember + forgot row */
+        .form-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.25rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .checkbox-wrap {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            cursor: pointer;
+        }
+
+        .checkbox-wrap input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--bah-teal);
+            cursor: pointer;
+        }
+
+        .checkbox-wrap span {
+            font-size: 0.8125rem;
+            color: var(--bah-gray-600);
+        }
+
+        .forgot-link {
+            font-size: 0.8125rem;
+            color: var(--bah-teal);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color var(--transition);
+        }
+
+        .forgot-link:hover {
+            color: var(--bah-teal-light);
+            text-decoration: underline;
+        }
+
+        /* Submit button */
+        .btn-login {
+            width: 100%;
+            padding: 0.8rem;
+            font-family: var(--font-body);
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: #fff;
+            background: linear-gradient(135deg, var(--bah-teal), var(--bah-blue));
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: transform var(--transition), box-shadow var(--transition), opacity var(--transition);
+            letter-spacing: 0.02em;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(27, 122, 110, 0.30);
+        }
+
+        .btn-login:active { transform: translateY(0); }
+
+        .btn-login:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Error message */
+        .error-msg {
+            display: none;
+            background: #FDF0EF;
+            border: 1px solid #F5C6C2;
+            border-radius: 8px;
+            padding: 0.65rem 0.875rem;
+            margin-bottom: 1rem;
+            font-size: 0.8125rem;
+            color: var(--bah-red);
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .error-msg.visible { display: flex; }
+
+        .error-msg svg {
+            flex-shrink: 0;
+            width: 16px;
+            height: 16px;
+            stroke: var(--bah-red);
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* Status badge */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(27, 122, 110, 0.08);
+            padding: 0.25rem 0.7rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--bah-teal);
+            margin-bottom: 1rem;
+        }
+
+        .status-badge .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--bah-teal-light);
+            animation: pulseDot 2s ease-in-out infinite;
+        }
+
+        @keyframes pulseDot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* Quick login section */
+        .quick-login {
+            margin-top: 1.25rem;
+            border-top: 1px solid var(--bah-gray-100);
+            padding-top: 1rem;
+        }
+
+        .quick-login-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--bah-gray-300);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            text-align: center;
+            margin-bottom: 0.625rem;
+        }
+
+        .quick-login-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.4rem;
+        }
+
+        .btn-quick {
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.5rem 0.6rem;
+            font-family: var(--font-body);
+            font-size: 0.8125rem;
+            font-weight: 500;
+            color: var(--bah-gray-600);
+            background: var(--bah-gray-50);
+            border: 1.5px solid var(--bah-gray-100);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all var(--transition);
+            text-align: left;
+            line-height: 1.3;
+        }
+
+        .btn-quick:hover {
+            border-color: var(--bah-teal);
+            color: var(--bah-teal);
+            background: rgba(27, 122, 110, 0.04);
+        }
+
+        .btn-quick:active { transform: scale(0.98); }
+
+        .btn-quick .role-icon {
+            width: 26px;
+            height: 26px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .btn-quick .role-icon svg {
+            width: 14px;
+            height: 14px;
+            stroke: white;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .btn-quick .role-label { display: flex; flex-direction: column; }
+        .btn-quick .role-name { font-weight: 600; font-size: 0.8125rem; color: var(--bah-gray-800); }
+        .btn-quick .role-user { font-size: 0.6875rem; color: var(--bah-gray-300); font-weight: 400; }
+        .btn-quick:hover .role-name { color: var(--bah-teal); }
+
+        .role-admin { background: var(--bah-navy); }
+        .role-it { background: var(--bah-blue); }
+        .role-nurse { background: #2E86AB; }
+        .role-doctor { background: var(--bah-teal); }
+        .role-compliance { background: var(--bah-gold); }
+        .role-depthead { background: #7B4B94; }
+
+        /* Footer */
+        .login-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.35);
+            line-height: 1.6;
+        }
+
+        .login-footer a {
+            color: rgba(255,255,255,0.5);
+            text-decoration: none;
+        }
+
+        .login-footer a:hover { color: rgba(255,255,255,0.7); }
+
+        /* Loading spinner */
+        .btn-login .spinner {
+            display: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            margin: 0 auto;
+        }
+
+        .btn-login.loading .spinner { display: block; }
+        .btn-login.loading .btn-text { display: none; }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ===================== DASHBOARD ===================== */
+        .dashboard {
+            display: none;
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .dashboard.visible { display: block; }
+
+        .dash-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .dash-header-left {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .dash-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.875rem;
+            color: white;
+        }
+
+        .dash-welcome {
+            color: rgba(255,255,255,0.6);
+            font-size: 0.8125rem;
+        }
+
+        .dash-welcome strong {
+            display: block;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .btn-logout {
+            padding: 0.5rem 1rem;
+            font-family: var(--font-body);
+            font-size: 0.8125rem;
+            font-weight: 500;
+            color: rgba(255,255,255,0.6);
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+
+        .btn-logout:hover {
+            background: rgba(255,255,255,0.15);
+            color: white;
+        }
+
+        .dash-card {
+            background: var(--bah-white);
+            border-radius: 16px;
+            padding: 2rem 1.75rem;
+            box-shadow: var(--bah-shadow-lg);
+            margin-bottom: 1rem;
+        }
+
+        .dash-card h3 {
+            font-family: var(--font-body);
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--bah-gray-800);
+            margin-bottom: 1rem;
+        }
+
+        .module-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+
+        .module-tile {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1.25rem 0.75rem;
+            background: var(--bah-gray-50);
+            border: 1.5px solid var(--bah-gray-100);
+            border-radius: 12px;
+            text-align: center;
+            cursor: default;
+            transition: all var(--transition);
+        }
+
+        .module-tile:hover {
+            border-color: var(--bah-teal);
+            background: rgba(27, 122, 110, 0.04);
+        }
+
+        .module-tile .tile-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .module-tile .tile-icon svg {
+            width: 20px;
+            height: 20px;
+            stroke: white;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .module-tile .tile-name {
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: var(--bah-gray-800);
+        }
+
+        .module-tile .tile-status {
+            font-size: 0.6875rem;
+            color: var(--bah-gray-300);
+        }
+
+        .dash-info {
+            text-align: center;
+            font-size: 0.8125rem;
+            color: rgba(255,255,255,0.35);
+            margin-top: 1rem;
+            line-height: 1.6;
+        }
+
+        .dash-info a {
+            color: rgba(255,255,255,0.5);
+            text-decoration: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            body { padding: 1rem 0.75rem 2rem; }
+            .login-card { padding: 1.5rem 1.25rem 1.25rem; border-radius: 12px; }
+            .brand h1 { font-size: 1.3rem; }
+            .brand-icon { width: 56px; height: 56px; border-radius: 14px; }
+            .brand-icon svg { width: 28px; height: 28px; }
+            .quick-login-grid { grid-template-columns: 1fr; }
+            .splash-title { font-size: 1.3rem; }
+            .module-grid { grid-template-columns: 1fr; }
+            .dash-card { padding: 1.5rem 1.25rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Splash Screen -->
+    <div class="splash" id="splash">
+        <div class="splash-icon">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9 2h6v6h6v6h-6v6H9v-6H3V8h6z"/></svg>
+        </div>
+        <div class="splash-title">Blantyre Adventist Hospital</div>
+        <div class="splash-subtitle">Operations Platform</div>
+        <div class="splash-loader"><div class="splash-loader-bar"></div></div>
+        <div class="splash-credit">Powered by TechNexus MW</div>
+    </div>
+
+    <!-- Background layer -->
+    <div class="bg-layer" aria-hidden="true"></div>
+
+    <!-- Login View -->
+    <div class="login-container" id="loginView">
+        <div class="brand">
+            <div class="brand-icon">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9 2h6v6h6v6h-6v6H9v-6H3V8h6z"/></svg>
+            </div>
+            <h1>Blantyre Adventist Hospital</h1>
+            <p>Operations Platform</p>
+        </div>
+
+        <div class="login-card">
+            <div class="status-badge">
+                <span class="dot"></span>
+                System Online
+            </div>
+
+            <h2>Staff Login</h2>
+
+            <div class="error-msg" id="errorMsg">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <span id="errorText">Invalid username or password.</span>
+            </div>
+
+            <div class="form-group">
+                <label for="username">Username</label>
+                <div class="input-wrap">
+                    <input type="text" id="username" name="username" placeholder="Enter your staff ID" autocomplete="username" required>
+                    <svg class="input-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="input-wrap">
+                    <input type="password" id="password" name="password" placeholder="Enter your password" autocomplete="current-password" required>
+                    <svg class="input-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    <button type="button" class="toggle-password" id="togglePwd" aria-label="Toggle password visibility">
+                        <svg viewBox="0 0 24 24" id="eyeIcon"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <label class="checkbox-wrap">
+                    <input type="checkbox" id="remember" name="remember">
+                    <span>Remember me</span>
+                </label>
+                <a href="#" class="forgot-link" id="forgotLink">Forgot password?</a>
+            </div>
+
+            <button type="button" class="btn-login" id="loginBtn">
+                <span class="btn-text">Sign In</span>
+                <div class="spinner"></div>
+            </button>
+
+            <!-- Quick login demo accounts -->
+            <div class="quick-login">
+                <div class="quick-login-label">Demo Accounts</div>
+                <div class="quick-login-grid">
+                    <button type="button" class="btn-quick" data-user="admin">
+                        <span class="role-icon role-admin"><svg viewBox="0 0 24 24"><path d="M12 15l-2 5l9-11h-5l2-5L7 15z"/></svg></span>
+                        <span class="role-label"><span class="role-name">Administrator</span><span class="role-user">admin</span></span>
+                    </button>
+                    <button type="button" class="btn-quick" data-user="it.support">
+                        <span class="role-icon role-it"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span>
+                        <span class="role-label"><span class="role-name">IT Support</span><span class="role-user">it.support</span></span>
+                    </button>
+                    <button type="button" class="btn-quick" data-user="nurse">
+                        <span class="role-icon role-nurse"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span>
+                        <span class="role-label"><span class="role-name">Nurse</span><span class="role-user">nurse</span></span>
+                    </button>
+                    <button type="button" class="btn-quick" data-user="doctor">
+                        <span class="role-icon role-doctor"><svg viewBox="0 0 24 24"><path d="M12 10v4m-2-2h4"/><circle cx="12" cy="12" r="10"/></svg></span>
+                        <span class="role-label"><span class="role-name">Doctor</span><span class="role-user">doctor</span></span>
+                    </button>
+                    <button type="button" class="btn-quick" data-user="compliance">
+                        <span class="role-icon role-compliance"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+                        <span class="role-label"><span class="role-name">Compliance</span><span class="role-user">compliance</span></span>
+                    </button>
+                    <button type="button" class="btn-quick" data-user="dept.head">
+                        <span class="role-icon role-depthead"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+                        <span class="role-label"><span class="role-name">Dept. Head</span><span class="role-user">dept.head</span></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="login-footer">
+            &copy; 2026 Blantyre Adventist Hospital. All rights reserved.<br>
+            Powered by <a href="https://technexusmw.com" target="_blank" rel="noopener">TechNexus MW</a>
+        </div>
+    </div>
+
+    <!-- Dashboard View -->
+    <div class="dashboard" id="dashboardView">
+        <div class="dash-header">
+            <div class="dash-header-left">
+                <div class="dash-avatar role-admin" id="dashAvatar">A</div>
+                <div class="dash-welcome">
+                    Welcome back
+                    <strong id="dashRole">Administrator</strong>
+                </div>
+            </div>
+            <button type="button" class="btn-logout" id="logoutBtn">Sign Out</button>
+        </div>
+
+        <div class="dash-card">
+            <h3>Platform Modules</h3>
+            <div class="module-grid">
+                <div class="module-tile">
+                    <div class="tile-icon" style="background: var(--bah-teal);">
+                        <svg viewBox="0 0 24 24"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14,2 14,8 20,8"/></svg>
+                    </div>
+                    <span class="tile-name">Ticketing</span>
+                    <span class="tile-status">Coming Soon</span>
+                </div>
+                <div class="module-tile">
+                    <div class="tile-icon" style="background: var(--bah-blue);">
+                        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    </div>
+                    <span class="tile-name">Compliance</span>
+                    <span class="tile-status">Coming Soon</span>
+                </div>
+                <div class="module-tile">
+                    <div class="tile-icon" style="background: var(--bah-gold);">
+                        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    </div>
+                    <span class="tile-name">Staff Directory</span>
+                    <span class="tile-status">Coming Soon</span>
+                </div>
+                <div class="module-tile">
+                    <div class="tile-icon" style="background: #7B4B94;">
+                        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+                    </div>
+                    <span class="tile-name">Reports</span>
+                    <span class="tile-status">Coming Soon</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="dash-info">
+            Session active. Modules under development.<br>
+            Powered by <a href="https://technexusmw.com" target="_blank" rel="noopener">TechNexus MW</a>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            /* =================== CONFIG =================== */
+            var DEMO_ACCOUNTS = {
+                'admin':      { role: 'Administrator',      color: 'role-admin',      initial: 'A' },
+                'it.support': { role: 'IT Support',         color: 'role-it',         initial: 'IT' },
+                'nurse':      { role: 'Nurse',              color: 'role-nurse',      initial: 'N' },
+                'doctor':     { role: 'Doctor',             color: 'role-doctor',     initial: 'D' },
+                'compliance': { role: 'Compliance Officer', color: 'role-compliance', initial: 'C' },
+                'dept.head':  { role: 'Department Head',    color: 'role-depthead',   initial: 'DH' }
+            };
+
+            var SPLASH_DURATION = 2500;
+
+            /* =================== DOM REFS =================== */
+            var splash     = document.getElementById('splash');
+            var loginView  = document.getElementById('loginView');
+            var dashView   = document.getElementById('dashboardView');
+            var usernameEl = document.getElementById('username');
+            var passwordEl = document.getElementById('password');
+            var loginBtn   = document.getElementById('loginBtn');
+            var errorMsg   = document.getElementById('errorMsg');
+            var errorText  = document.getElementById('errorText');
+            var togglePwd  = document.getElementById('togglePwd');
+            var eyeIcon    = document.getElementById('eyeIcon');
+            var forgotLink = document.getElementById('forgotLink');
+            var logoutBtn  = document.getElementById('logoutBtn');
+            var dashAvatar = document.getElementById('dashAvatar');
+            var dashRole   = document.getElementById('dashRole');
+
+            /* =================== SPLASH =================== */
+            function dismissSplash(showLogin) {
+                splash.classList.add('hidden');
+                if (showLogin) {
+                    loginView.classList.add('visible');
+                }
+                setTimeout(function() {
+                    splash.style.display = 'none';
+                }, 600);
+            }
+
+            /* =================== PASSWORD TOGGLE =================== */
+            togglePwd.addEventListener('click', function() {
+                var isPassword = passwordEl.type === 'password';
+                passwordEl.type = isPassword ? 'text' : 'password';
+                eyeIcon.innerHTML = isPassword
+                    ? '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>'
+                    : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+            });
+
+            /* =================== FORGOT PASSWORD =================== */
+            forgotLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('Contact your system administrator or email technexus_mw@proton.me for password reset.');
+            });
+
+            /* =================== AUTH =================== */
+            function showError(msg) {
+                errorText.textContent = msg;
+                errorMsg.classList.add('visible');
+            }
+
+            function clearError() {
+                errorMsg.classList.remove('visible');
+            }
+
+            function showDashboard(username, account) {
+                sessionStorage.setItem('bah_user', JSON.stringify({
+                    username: username,
+                    role: account.role,
+                    loginTime: new Date().toISOString()
+                }));
+
+                dashAvatar.textContent = account.initial;
+                dashAvatar.className = 'dash-avatar ' + account.color;
+                dashRole.textContent = account.role;
+
+                loginView.classList.remove('visible');
+                loginView.style.display = 'none';
+                dashView.classList.add('visible');
+                window.scrollTo(0, 0);
+            }
+
+            function doLogin(username) {
+                clearError();
+                var user = (username || '').trim().toLowerCase();
+
+                if (!user) {
+                    showError('Please enter a username.');
+                    return;
+                }
+
+                var account = DEMO_ACCOUNTS[user];
+                if (!account) {
+                    showError('Invalid username. Use a demo account below.');
+                    passwordEl.value = '';
+                    return;
+                }
+
+                loginBtn.classList.add('loading');
+                loginBtn.disabled = true;
+
+                setTimeout(function() {
+                    loginBtn.classList.remove('loading');
+                    loginBtn.disabled = false;
+                    showDashboard(user, account);
+                }, 600);
+            }
+
+            /* =================== SIGN IN =================== */
+            loginBtn.addEventListener('click', function() {
+                doLogin(usernameEl.value);
+            });
+
+            usernameEl.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') { e.preventDefault(); doLogin(usernameEl.value); }
+            });
+            passwordEl.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') { e.preventDefault(); doLogin(usernameEl.value); }
+            });
+
+            /* =================== QUICK LOGIN =================== */
+            var quickBtns = document.querySelectorAll('.btn-quick');
+            for (var i = 0; i < quickBtns.length; i++) {
+                quickBtns[i].addEventListener('click', (function(btn) {
+                    return function() {
+                        var user = btn.getAttribute('data-user');
+                        usernameEl.value = user;
+                        passwordEl.value = '********';
+                        doLogin(user);
+                    };
+                })(quickBtns[i]));
+            }
+
+            /* =================== LOGOUT =================== */
+            logoutBtn.addEventListener('click', function() {
+                sessionStorage.removeItem('bah_user');
+                dashView.classList.remove('visible');
+                loginView.style.display = '';
+                loginView.classList.add('visible');
+                usernameEl.value = '';
+                passwordEl.value = '';
+                clearError();
+                window.scrollTo(0, 0);
+            });
+
+            /* =================== SESSION RESUME =================== */
+            var resumed = false;
+            try {
+                var saved = sessionStorage.getItem('bah_user');
+                if (saved) {
+                    var session = JSON.parse(saved);
+                    var account = DEMO_ACCOUNTS[session.username];
+                    if (account) {
+                        resumed = true;
+                        dismissSplash(false);
+                        loginView.style.display = 'none';
+                        showDashboard(session.username, account);
+                    }
+                }
+            } catch (e) { /* ignore corrupt data */ }
+
+            /* =================== START SPLASH TIMER =================== */
+            if (!resumed) {
+                setTimeout(function() {
+                    dismissSplash(true);
+                }, SPLASH_DURATION);
+            }
+
+        })();
+    </script>
+</body>
+</html>
